@@ -1,0 +1,28 @@
+{
+  "name": "Allsides pal",
+  "description": "Because all the other ones suck ass",
+  "version": "0.1",
+  "manifest_version": 3,
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["bias-tooltip.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "permissions": ["storage", "activeTab","tabs","unlimitedStorage"],
+  "host_permissions": ["https://allsides-api.herokuapp.com/"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/unknown.png"
+      }
+  },
+  "options_page": "options.html"
+}
