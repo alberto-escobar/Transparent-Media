@@ -158,7 +158,7 @@ function updatePopup(){
     var tab_url = tabs[0].url;
     var tab_url = tab_url.split("/")[2];
     var search = findAllsidesSource(tab_url);
-    chrome.storage.local.set({ 'popup' : search })
+    chrome.storage.local.set({ 'popup' : search });
     updatePopupIcon(search);
 
   });
