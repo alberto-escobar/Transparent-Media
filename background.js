@@ -23,7 +23,9 @@ setInterval(function() {
 }, 120 * 60 * 1000);
 
 function saveDatabase(){
-  chrome.storage.local.set({ "database" : database });
+  chrome.storage.local.set({ "database" : database }, function(){
+    console.log("set database into storage with length of:" + database.length);
+  });
 }
 
 //fetchDatabase(): Fetches allsides data gatheters on allsides api and assignes it to the database array in memory.
@@ -70,6 +72,7 @@ chrome.tabs.onActivated.addListener(() => {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     //console.log("recieved array from content script to process")
+    console.log(database.length);
     if (request.data)
       var response = request.data;
       for(var i = 0;i < response.length;i++){
@@ -90,6 +93,7 @@ chrome.runtime.onMessage.addListener(
 
 //new search function that parses through the allsides database and matches the arguement url to the array of urls. This helps deal with the weird cases you got.
 function findAllsidesSource(url_query){
+  
   //assume link is in the form of www.example.com or example.com
   //this if statement takes care if the query is undefined, ends the funcion call back returning nodata
   if(url_query !== undefined) {
@@ -110,8 +114,8 @@ function findAllsidesSource(url_query){
   else {
     return "no data";
   }
-  while(database == []){
-    console.log("lol")
+
+  if(database.length == 0){
     chrome.storage.local.get("database", function(obj) {
       database = obj.database
       console.log("retrieved old database");
@@ -154,6 +158,7 @@ function findAllsidesSourceTest(){
 
 //update the popup with the current information available on the active tab
 function updatePopup(){
+  console.log(database.length);
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
     var tab_url = tabs[0].url;
     var tab_url = tab_url.split("/")[2];
