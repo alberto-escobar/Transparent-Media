@@ -1,7 +1,7 @@
 {
-  "name": "AllSidesPal",
-  "description": "lmao",
-  "version": "0.1",
+  "name": "News Bias Reporter",
+  "description": "News Bias Reporter is a tool that reports to you the poitical bias of the news site that you are viewing on chrome.",
+  "version": "1.0",
   "manifest_version": 3,
 
   "background": {
