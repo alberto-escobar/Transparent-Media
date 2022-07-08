@@ -1,7 +1,7 @@
 {
   "name": "News Bias Reporter",
-  "description": "News Bias Reporter is a tool that reports to you the poitical bias of the news site that you are viewing on chrome.",
-  "version": "1.0",
+  "description": "A tool that reports to you the poitical bias and factual reporting of the news site that you are viewing on google based on data from allsides.com and mediabiasfactcheck.com.",
+  "version": "2.0",
   "manifest_version": 3,
 
   "background": {
@@ -16,13 +16,26 @@
     }
   ],
 
-  "permissions": ["storage", "activeTab","tabs","unlimitedStorage"],
-  "host_permissions": ["https://allsides-api.herokuapp.com/"],
+  "permissions": [
+    "storage", 
+    "activeTab",
+    "tabs",
+    "unlimitedStorage"
+  ],
+
+  "host_permissions": [
+    "https://allsides-api.herokuapp.com/"
+  ],
+
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/unknown.png"
-      }
+    "default_popup": "popup.html"
   },
+
+  "icons": {
+    "24": "icons/unknown.png",
+    "48": "icons/unknown1.png",
+    "128": "icons/unknown2.png"
+  },
+
   "options_page": "options.html"
 }
