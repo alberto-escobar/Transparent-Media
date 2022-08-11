@@ -1,7 +1,7 @@
 {
   "name": "Transparent Media",
   "description": "A chrome extension that reports to you the poitical bias and reporting accuracy of the news site that you are viewing based on data from allsides.com and mediabiasfactcheck.com.",
-  "version": "2.0",
+  "version": "1.0",
   "manifest_version": 3,
 
   "background": {
