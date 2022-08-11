@@ -1,6 +1,6 @@
 // background.js
 const hardcode = ["youtube","google"]
-const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1"]
+const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1","web"]
 const API_URL = "https://allsides-api.herokuapp.com/extension/ASdata";
 const MBFC_URL = "https://allsides-api.herokuapp.com/extension/MBFCdata";
 var ASdatabase = [];

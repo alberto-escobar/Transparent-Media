@@ -1,6 +1,6 @@
 {
-  "name": "News Bias Reporter",
-  "description": "A tool that reports to you the poitical bias and factual reporting of the news site that you are viewing on google based on data from allsides.com and mediabiasfactcheck.com.",
+  "name": "Transparent Media",
+  "description": "A chrome extension that reports to you the poitical bias and reporting accuracy of the news site that you are viewing based on data from allsides.com and mediabiasfactcheck.com.",
   "version": "2.0",
   "manifest_version": 3,
 
