@@ -118,7 +118,9 @@ function updatePopup(){
     var tab_url = tab_url.split("/")[2];
     var search = findASSource(tab_url);
     var MBFCsearch = findMBFCSource(tab_url)
-    //chrome.storage.local.set({ 'popup' : search, 'MBFCpopup':MBFCsearch },() => {console.log("updated popup with:");console.log(search);console.log(MBFCsearch);});
+    chrome.storage.local.set({ 'popup' : search, 'MBFCpopup':MBFCsearch },() => {
+    //  console.log("updated popup with:");console.log(search);console.log(MBFCsearch);
+    });
     
     if (MBFCsearch == "no data"){
       updatePopupIcon(search);
