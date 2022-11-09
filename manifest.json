@@ -1,6 +1,6 @@
 {
   "name": "Transparent Media",
-  "description": "An extension that reports to you the factual and bias ratings of the website you are viewing based on its rating on allsides.com and mediabiasfactcheck.com.",
+  "description": "An extension that reports to you the political bias of the website you are viewing based on a database of news sources.",
   "version": "1.0",
   "manifest_version": 3,
 
