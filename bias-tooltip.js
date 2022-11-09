@@ -1,5 +1,5 @@
+//fetch options from storage so that content script knows weather to put stickers, tooltips, or boths.
 var options;
-//fetch options from storage so that content script know weather to but stickers, tooltips, or boths.
 chrome.storage.local.get("options", function(obj) {
   options = obj.options;
 });
@@ -28,7 +28,7 @@ chrome.runtime.sendMessage({"data": [{"href":location.href, "bias": "no data"}]}
         //iterate over the array of URLs that have appended bias information 
         for(var j = 0;j < data.length;j++){
           //if the URL on the URL array matches the href attribute of the <a> element in the <a> array
-          //and the active tab is on google, and not in an image search then insert sticker or tooltip (based on current options)  
+          //and the active tab is on google, and not in an image search then insert stickers or tooltips (based on options)  
           if(href == data[j].href && 
           location.href.split(".")[1] == "google" && 
           !location.href.includes("tbm=isch")){
@@ -51,64 +51,8 @@ chrome.runtime.sendMessage({"data": [{"href":location.href, "bias": "no data"}]}
               addSticker(createMBFCFactualSticker(data[j]), links[i]);
               addSticker(createMBFCBiasSticker(data[j]), links[i]);
               addSticker(createAllsidesBiasSticker(data[j]), links[i]);
-              
-              
             }
           }
-          /*
-          //if the URL on the URL array matches the href attribute of the <a> element in the <a> array
-          //and the active tab is on reddit, then insert sticker or tooltip (based on current options)  
-          if(href == data[j].href && 
-            location.href.includes("reddit")){
-              if(options.tooltips){
-                var tooltipMessage = ""
-                if (data[j].bias !== "no data"){
-                  tooltipMessage = tooltipMessage + "Allsides: " + data[j].bias + " bias\r\n"
-                }
-                if (data[j].MBFCbias !== "no data"){
-                  tooltipMessage = tooltipMessage + "MBFC: " + data[j].MBFCbias + " bias\r\n"
-                }
-                if (!data[j].MBFCfactual.includes("no")){
-                  tooltipMessage = tooltipMessage + "MBFC: " + data[j].MBFCfactual + " factual reporting"
-                }
-                if(tooltipMessage !== ""){
-                  links[i].title = tooltipMessage
-                }
-              }
-              if(options.stickers){
-                addSticker(createMBFCFactualSticker(data[j]), links[i]);
-                addSticker(createMBFCBiasSticker(data[j]), links[i]);
-                addSticker(createAllsidesBiasSticker(data[j]), links[i]);
-              }
-            }
-            */
-            /*
-            //if the URL on the URL array matches the href attribute of the <a> element in the <a> array
-            //and the active tab is on duckduckgo, then insert sticker or tooltip (based on current options)  
-            if(href == data[j].href && 
-              location.href.includes("duckduckgo")){
-                if(options.tooltips){
-                  var tooltipMessage = ""
-                  if (data[j].bias !== "no data"){
-                    tooltipMessage = tooltipMessage + "Allsides: " + data[j].bias + " bias\r\n"
-                  }
-                  if (data[j].MBFCbias !== "no data"){
-                    tooltipMessage = tooltipMessage + "MBFC: " + data[j].MBFCbias + " bias\r\n"
-                  }
-                  if (!data[j].MBFCfactual.includes("no")){
-                    tooltipMessage = tooltipMessage + "MBFC: " + data[j].MBFCfactual + " factual reporting"
-                  }
-                  if(tooltipMessage !== ""){
-                    links[i].title = tooltipMessage
-                  }
-                }
-                if(options.stickers){
-                  addSticker(createMBFCFactualSticker(data[j]), links[i]);
-                  addSticker(createMBFCBiasSticker(data[j]), links[i]);
-                  addSticker(createAllsidesBiasSticker(data[j]), links[i]);
-                }
-              }
-              */
         }
       }
     });
@@ -278,9 +222,10 @@ function addSticker(sticker, link) {
     return false;
   }
   else {
-    //do nothign
+    //do nothing
   }
 
+  //insert into general result in all tab
   if(parentNode.getAttribute("class") == "yuRUbf"){ 
     insertAfter(sticker, parentNode);
     console.log("Google case 1: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
@@ -304,13 +249,15 @@ function addSticker(sticker, link) {
     console.log("Google case 4: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
-
+/*
+  //reddit cases
   else if(link.getAttribute("class") == "_13svhQIUZqD9PVzFcLwOKT styled-outbound-link"){ 
     insertAfter(sticker, parentNode);
     console.log("Reddit case 1: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
 
+  //duckduckgo cases
   else if(link.getAttribute("class") == "eVNpHGjtxRBq_gLOfGDr"){ 
     insertAfter(sticker, parentNode);
     console.log("Duckduckgo case 1: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
@@ -330,5 +277,5 @@ function addSticker(sticker, link) {
     console.log("Could not insert stickers with" + sticker.innerHTML + " bias data into following href: " + link.href)
     return false;
   }
-
+*/
 }

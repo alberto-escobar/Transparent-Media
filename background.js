@@ -2,8 +2,8 @@
 const hardcode = ["youtube","google"]
 const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1","web","ca"]
 //use rapid api endpoint to track users
-const API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
-const MBFC_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
+const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
+const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
 var ASdatabase = [];
 var MBFCdatabase = [];
 var option
@@ -45,12 +45,12 @@ function fetchASDatabase(){
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json;charset=UTF-8",
-      "url": API_URL,
+      "url": AS_API_URL,
       'X-RapidAPI-Key': 'c68506b6c4msh761b24c39cc0233p10207cjsnd103f347dfc4',
       'X-RapidAPI-Host': 'transparent-media-extension-endpoints.p.rapidapi.com'
     },
   };
-  fetch(API_URL, options)
+  fetch(AS_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
       ASdatabase = data;
@@ -72,12 +72,12 @@ function fetchMBFCDatabase(){
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json;charset=UTF-8",
-      "url": MBFC_URL,
+      "url": MBFC_API_URL,
       'X-RapidAPI-Key': 'c68506b6c4msh761b24c39cc0233p10207cjsnd103f347dfc4',
       'X-RapidAPI-Host': 'transparent-media-extension-endpoints.p.rapidapi.com'
     },
   };
-  fetch(MBFC_URL, options)
+  fetch(MBFC_API_URL, options)
     .then((response) => response.json())
     .then((MBFCdata) => {
       MBFCdatabase = MBFCdata;
@@ -287,43 +287,13 @@ function lookupInDatabase(url,database) {
     url = url.filter(word => commonStuff.indexOf(word) == -1)
     for (let i = 0; i < url.length; i++) {
       if (hardcode.includes(url[i])){
-        return "no data"; //returned if url is in hard code
+        return "no data"; //returned if url is in hardcode array
       }
     }
   }
   else {
     return "no data"; //returned if url is undefined
   }
-  /*
-  if(database !== (undefined||[])){
-    
-    var search = database
-    for (let i = 0; i < url.length; i++) {
-      var temp = [];
-      for (let j = 0; j < search.length; j++) {
-        if(search[j].urlarray.includes(url[i])){
-          temp.push(search[j]);
-        }
-        else {
-          //do nothing
-        } 
-      }
-      search = temp;
-      if (search.length == 1){
-        return search[0] //returned if search has only yielded one result
-      }
-      else if(search.length == 0){
-        return "no data" //returned if search has only yielded no result
-      }
-      else {
-        //do nothing
-      }
-    }
-    return search; //returned if search has many results and is an array
-  }
-  */
-
-
   if(database !== (undefined||[])){
     
     var search = database
@@ -343,7 +313,7 @@ function lookupInDatabase(url,database) {
         return search[0] //returned if search has only yielded one result
       }
       else if(search.length == 0){
-        return "no data" //returned if search has only yielded no result
+        return "no data" //returned if search has yielded no result
       }
       else {
         //do nothing
@@ -354,5 +324,4 @@ function lookupInDatabase(url,database) {
   else {
     return "no data" //returned if databases are empty
   }
-
 }
