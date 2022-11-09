@@ -228,25 +228,25 @@ function addSticker(sticker, link) {
   //insert into general result in all tab
   if(parentNode.getAttribute("class") == "yuRUbf"){ 
     insertAfter(sticker, parentNode);
-    console.log("Google case 1: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
+    //console.log("Google case 1: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
   //insert into Video search result in video tab
   else if(parentNode.getAttribute("class") == "ct3b9e"){ 
     insertAfter(sticker, parentNode);
-    console.log("Google case 2: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
+    //console.log("Google case 2: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
   //insert into Video result in all tab
   else if(link.getAttribute("class") == "X5OiLe"){ 
     insertAfter(sticker, link);
-    console.log("Google case 3: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
+    //console.log("Google case 3: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
   //insert into news card or news result in all tab
   else if(link.getAttribute("class") == "WlydOe"){ 
     insertAfter(sticker, parentNode);
-    console.log("Google case 4: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
+    //console.log("Google case 4: injected " + sticker.innerHTML + " bias data into following href: " + link.href + " at the element with class " + parentNode.getAttribute("class"));
     return true;
   }
 /*

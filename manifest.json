@@ -1,6 +1,6 @@
 {
   "name": "Transparent Media",
-  "description": "An extension that reports to you the poitical bias and accuracy of the news sites based on data from allsides and mediabiasfactcheck",
+  "description": "An extension that reports to you the factual and bias ratings of the website you are viewing based on its rating on allsides.com and mediabiasfactcheck.com.",
   "version": "1.0",
   "manifest_version": 3,
 
@@ -18,13 +18,8 @@
 
   "permissions": [
     "storage", 
-    "activeTab",
     "tabs",
     "unlimitedStorage"
-  ],
-
-  "host_permissions": [
-    "https://allsides-api.herokuapp.com/"
   ],
 
   "action": {

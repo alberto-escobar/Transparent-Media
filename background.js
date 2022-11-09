@@ -118,7 +118,7 @@ function updatePopup(){
     var tab_url = tab_url.split("/")[2];
     var search = findASSource(tab_url);
     var MBFCsearch = findMBFCSource(tab_url)
-    chrome.storage.local.set({ 'popup' : search, 'MBFCpopup':MBFCsearch },() => {console.log("updated popup with:");console.log(search);console.log(MBFCsearch);});
+    //chrome.storage.local.set({ 'popup' : search, 'MBFCpopup':MBFCsearch },() => {console.log("updated popup with:");console.log(search);console.log(MBFCsearch);});
     
     if (MBFCsearch == "no data"){
       updatePopupIcon(search);
@@ -171,7 +171,7 @@ function updatePopupIcon(source){
 //listener event: runs when the bias-tooltip.js content script sends a message requesting bias information for an array of urls.
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    console.log("recieved array from content script to process with length: " + request.data.length)
+    //console.log("recieved array from content script to process with length: " + request.data.length)
     if (request.data)
       var response = request.data;
       for(var i = 0;i < response.length;i++){
@@ -193,7 +193,7 @@ chrome.runtime.onMessage.addListener(
           response[i].MBFCfactual = MBFCsearch; 
         }
       }
-      console.log(response)
+      //console.log(response)
       sendResponse({"data": response});
   }
 );
