@@ -222,8 +222,7 @@ function findASSource(url_query){
   else {
     return output
   }
-}
-
+};
 //finds the best source on an array of sources based on highest agreement numbers.
 function findBest(array){
   var temp = [];
