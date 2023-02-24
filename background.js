@@ -8,6 +8,13 @@ var ASdatabase = [];
 var MBFCdatabase = [];
 var option
 
+//importing external secript
+try {
+  importScripts("DatabaseHelper.js");
+} catch (e) {
+  console.log(e);
+}
+
 //listener event: anytime options changes in storage, update it here.
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   if ("options" in changes) {
@@ -28,14 +35,12 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.windows.onCreated.addListener(() => {
   fetchASDatabase();
   fetchMBFCDatabase();
+  chrome.storage.local.get("MBFCdatabase", function(obj) {
+    let test = new MBFCSearch(obj.MBFCdatabase);
+    test.test()
+  });
 });
 
-//interval event: every 2 hours, fetch the database from Allsides API
-setInterval(function() {
-  console.log("routine call for data") 
-  fetchASDatabase();
-  fetchMBFCDatabase(); 
-}, 30 * 60 * 1000);
 
 //fetchDatabase(): Fetches allsides data gatheters on allsides api and assignes it to the database array in memory.
 function fetchASDatabase(){

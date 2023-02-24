@@ -1,0 +1,10 @@
+instead of having a bunch of functions for searching as and MBFC in background.js, 
+I created a script that is imported using importScript and contains 3 classes. They are:
+Database
+MBFC_Database (extends Database)
+AS_Database (extends Database)
+
+in each class, the methods for searching URLs will be contained with in. with the search function outputing the best matching result
+the search algorithm would be containined in the Database class
+
+IF NO RESULT APPEARS, RETURN undefined. STOP USING "no data", it is an annoying nomenclature to use.
