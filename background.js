@@ -1,25 +1,12 @@
 //importing external secript
-try {
-  importScripts("DatabaseHelper.js");
-} catch (e) {
-  console.log(e);
-}
+try { importScripts("DatabaseHelper.js"); } catch (e) { console.log(e); }
 
-// background.js
-//const hardcode = ["youtube","google"]
-//const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1","web","ca"]
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
 var ASdatabase = [];
 var MBFCdatabase = [];
 var option
-
-
-
-var ASTest = new Database();
-var MBFCTest = new Database();
-
 
 //listener event: anytime options changes in storage, update it here.
 chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -37,13 +24,10 @@ chrome.runtime.onInstalled.addListener(() => {
   fetchMBFCDatabase();
 });
 
-//listener event: Updates the database in memory when a new chrome window is created.
+//listener event: Updates the database in memory when a new chrome window is created or chrome is started up.
 chrome.windows.onCreated.addListener(() => {
   fetchASDatabase();
   fetchMBFCDatabase();
-  console.log(AStest.search("https://www.cnn.com/"));
-  console.log(AStest.search("https://www.cnn.com/business"));
-  console.log(AStest.search("https://www.cnn.com/opinions"));
 });
 
 
@@ -79,7 +63,6 @@ function fetchASDatabase(){
     .then((response) => response.json())
     .then((data) => {
       ASdatabase = data;
-      ASTest.database = data;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
       for (let i = 0; i < ASdatabase.length; i++){
         ASdatabase[i].urlarray = ASdatabase[i].url.split(".");
@@ -107,7 +90,6 @@ function fetchMBFCDatabase(){
     .then((response) => response.json())
     .then((MBFCdata) => {
       MBFCdatabase = MBFCdata;
-      MBFCTest.database = MBFCdata;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
       for (let i = 0; i < MBFCdatabase.length; i++){
         if(MBFCdatabase[i].url){
@@ -123,69 +105,50 @@ function fetchMBFCDatabase(){
       });
     });
 }
-
 //update the popup with the current information available on the active tab
-function updatePopup(){
+async function updatePopup(){
+    let ASDatabaseHelper = new Database();
+    let obj = await chrome.storage.local.get("ASdatabase")
+    ASDatabaseHelper.database = obj.ASdatabase;
 
-  chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-    let tabURL = tabs[0].url
-    var ASsearch = ASTest.search(tabURL);
-    var MBFCsearch = MBFCTest.search(tabURL)
-    chrome.storage.local.set({ 'popup' : ASsearch, 'MBFCpopup':MBFCsearch },() => {
+    let MBFCDatabaseHelper = new Database();
+    obj = await chrome.storage.local.get("MBFCdatabase");
+    MBFCDatabaseHelper.database = obj.MBFCdatabase;
+    
+    currentTab = await chrome.tabs.query({currentWindow: true, active: true});
+    currentTabUrl = currentTab[0].url
+
+    let ASsearch = ASDatabaseHelper.search(currentTabUrl)
+    let MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
+    await chrome.storage.local.set({ 'popup':ASsearch, 'MBFCpopup':MBFCsearch},() => {
       console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
     });
-    
-    if (MBFCsearch === undefined){
-      updatePopupIcon(ASsearch);
-    }
-    else {
-      updatePopupIcon(MBFCsearch);
-    }
-    
-  });
+
+    updatePopupIcon(ASsearch);
+    updatePopupIcon(MBFCsearch);
 }
-//beggining of a hash map concept here
+//javascript object that is a hash map of different political bias and thier respective icons
 const iconMap = {
   "left":"icons/left.png",
   "left-center":"icons/left center.png",
   "center":"icons/center.png",
   "right-center":"icons/right center.png",
+  "right":"icons/right.png",
+  "allsides":"icons/allsides.png",
+  "fake-news":"icons/bad.png",
+  "satire":"icons/satire.png",
+  "conspiracy":"icons/bad.png",
+  "pro-science":"icons/pro science.png",
 } 
+
 //update the popup icon with the bias of the current site you are viewing.
 function updatePopupIcon(source){
-  if(source == undefined){source = {"bias": "no data"}}
-  if(source.bias == "left"){
-    chrome.action.setIcon({ "path": "icons/left.png"});
-  }
-  else if(source.bias == "left-center"){
-    chrome.action.setIcon({ "path": "icons/left center.png"});
-  }
-  else if(source.bias == "center"){
-    chrome.action.setIcon({ "path": "icons/center.png"});
-  }
-  else if(source.bias == "right-center"){
-    chrome.action.setIcon({ "path": "icons/right center.png"});
-  }
-  else if(source.bias == "right"){
-    chrome.action.setIcon({ "path": "icons/right.png"});
-  }
-  else if(source.bias == "allsides"){
-    chrome.action.setIcon({ "path": "icons/allsides.png"});
-  }
-  else if(source.bias == "fake-news"){
-    chrome.action.setIcon({ "path": "icons/bad.png"});
-  }
-  else if(source.bias == "satire"){
-    chrome.action.setIcon({ "path": "icons/satire.png"});
-  }
-  else if(source.bias == "conspiracy"){
-    chrome.action.setIcon({ "path": "icons/bad.png"});
-  }
-  else if(source.bias == "pro-science"){
-    chrome.action.setIcon({ "path": "icons/pro science.png"});
-  }
-  else {
-    chrome.action.setIcon({ "path": "icons/unknown.png"});
+  if(source){
+    if(iconMap?.[source.bias])
+      chrome.action.setIcon({ "path": iconMap[source.bias]});
+    else{
+      chrome.action.setIcon({ "path": "icons/unknown.png"});
+    }
   }
 }
 

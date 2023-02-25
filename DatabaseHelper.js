@@ -27,16 +27,3 @@ class Database{
     return bestResult
   }
 }
-
-
-class MBFCDatabase extends Database {
-    constructor(database){
-        super(database);
-    }
-}
-
-class ASDatabase extends Database {
-  constructor(database){
-    super(database);
-  }
-}
