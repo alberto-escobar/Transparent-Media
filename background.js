@@ -1,6 +1,13 @@
+//importing external secript
+try {
+  importScripts("DatabaseHelper.js");
+} catch (e) {
+  console.log(e);
+}
+
 // background.js
-const hardcode = ["youtube","google"]
-const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1","web","ca"]
+//const hardcode = ["youtube","google"]
+//const commonStuff = ["www","ww1","com","org","www2","blog","outlook","www1","web","ca"]
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
@@ -8,12 +15,11 @@ var ASdatabase = [];
 var MBFCdatabase = [];
 var option
 
-//importing external secript
-try {
-  importScripts("DatabaseHelper.js");
-} catch (e) {
-  console.log(e);
-}
+
+
+var ASTest = new Database();
+var MBFCTest = new Database();
+
 
 //listener event: anytime options changes in storage, update it here.
 chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -35,12 +41,26 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.windows.onCreated.addListener(() => {
   fetchASDatabase();
   fetchMBFCDatabase();
-  chrome.storage.local.get("MBFCdatabase", function(obj) {
-    let test = new MBFCSearch(obj.MBFCdatabase);
-    test.test()
-  });
+  console.log(AStest.search("https://www.cnn.com/"));
+  console.log(AStest.search("https://www.cnn.com/business"));
+  console.log(AStest.search("https://www.cnn.com/opinions"));
 });
 
+
+
+
+//listener event: whenever a tab is updated (e.g. the url changes), parse the url for the domain. If the url is defined and the page is loaded, run the updatePopup function
+chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
+  var url = tab.url;
+  if (url !== undefined && changeinfo.status == "complete") {
+    updatePopup();
+  }
+});
+
+//listener event: whenever a tab is changed, the new active tab will have updatePopup executed
+chrome.tabs.onActivated.addListener(() => {
+  updatePopup();
+});
 
 //fetchDatabase(): Fetches allsides data gatheters on allsides api and assignes it to the database array in memory.
 function fetchASDatabase(){
@@ -59,6 +79,7 @@ function fetchASDatabase(){
     .then((response) => response.json())
     .then((data) => {
       ASdatabase = data;
+      ASTest.database = data;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
       for (let i = 0; i < ASdatabase.length; i++){
         ASdatabase[i].urlarray = ASdatabase[i].url.split(".");
@@ -86,6 +107,7 @@ function fetchMBFCDatabase(){
     .then((response) => response.json())
     .then((MBFCdata) => {
       MBFCdatabase = MBFCdata;
+      MBFCTest.database = MBFCdata;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
       for (let i = 0; i < MBFCdatabase.length; i++){
         if(MBFCdatabase[i].url){
@@ -102,33 +124,19 @@ function fetchMBFCDatabase(){
     });
 }
 
-//listener event: whenever a tab is updated (e.g. the url changes), parse the url for the domain. If the url is defined and the page is loaded, run the updatePopup function
-chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
-  var url = tab.url;
-  if (url !== undefined && changeinfo.status == "complete") {
-    updatePopup();
-  }
-});
-
-//listener event: whenever a tab is changed, the new active tab will have updatePopup executed
-chrome.tabs.onActivated.addListener(() => {
-  updatePopup();
-});
-
 //update the popup with the current information available on the active tab
 function updatePopup(){
 
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-    var tab_url = tabs[0].url;
-    var tab_url = tab_url.split("/")[2];
-    var search = findASSource(tab_url);
-    var MBFCsearch = findMBFCSource(tab_url)
-    chrome.storage.local.set({ 'popup' : search, 'MBFCpopup':MBFCsearch },() => {
-    //  console.log("updated popup with:");console.log(search);console.log(MBFCsearch);
+    let tabURL = tabs[0].url
+    var ASsearch = ASTest.search(tabURL);
+    var MBFCsearch = MBFCTest.search(tabURL)
+    chrome.storage.local.set({ 'popup' : ASsearch, 'MBFCpopup':MBFCsearch },() => {
+      console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
     });
     
-    if (MBFCsearch == "no data"){
-      updatePopupIcon(search);
+    if (MBFCsearch === undefined){
+      updatePopupIcon(ASsearch);
     }
     else {
       updatePopupIcon(MBFCsearch);
@@ -136,7 +144,13 @@ function updatePopup(){
     
   });
 }
-
+//beggining of a hash map concept here
+const iconMap = {
+  "left":"icons/left.png",
+  "left-center":"icons/left center.png",
+  "center":"icons/center.png",
+  "right-center":"icons/right center.png",
+} 
 //update the popup icon with the bias of the current site you are viewing.
 function updatePopupIcon(source){
   if(source == undefined){source = {"bias": "no data"}}
