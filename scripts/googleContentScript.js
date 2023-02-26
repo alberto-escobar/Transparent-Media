@@ -6,7 +6,10 @@ chrome.storage.local.get("options", function(obj) {
 
 runContentScript();
 
-async function runContentScript(){
+async function runContentScript(){ 
+  let options = await chrome.storage.local.get("options")
+  options = options.options
+
   //create database helpers
   let ASDatabaseHelper = new DatabaseHelper();
   let obj = await chrome.storage.local.get("ASdatabase")

@@ -4,14 +4,6 @@ try { importScripts("libraries/DatabaseHelper.js"); } catch (e) { console.log(e)
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
-var option
-
-//listener event: anytime options changes in storage, update it here.
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  if ("options" in changes) {
-    options = changes.options.newValue;
-  }
-});
 
 //listener event: Updates the database in memory when the extension is first installed.
 chrome.runtime.onInstalled.addListener(() => {
@@ -83,7 +75,10 @@ function fetchMBFCDatabase(){
 }
 
 //update the popup with the current information available on the active tab
-async function updatePopup(){    
+async function updatePopup(){
+    let options = await chrome.storage.local.get("options")
+    options = options.options
+
     let obj = await chrome.storage.local.get("ASdatabase")
     let ASDatabaseHelper = new DatabaseHelper(obj.ASdatabase);
 
