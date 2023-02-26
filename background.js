@@ -4,14 +4,12 @@ try { importScripts("DatabaseHelper.js"); } catch (e) { console.log(e); }
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
-var ASdatabase = [];
-var MBFCdatabase = [];
 var option
 
 //listener event: anytime options changes in storage, update it here.
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   if ("options" in changes) {
-      options = changes.options.newValue;
+    options = changes.options.newValue;
   }
 });
 
@@ -30,13 +28,9 @@ chrome.windows.onCreated.addListener(() => {
   fetchMBFCDatabase();
 });
 
-
-
-
 //listener event: whenever a tab is updated (e.g. the url changes), parse the url for the domain. If the url is defined and the page is loaded, run the updatePopup function
 chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
-  var url = tab.url;
-  if (url !== undefined && changeinfo.status == "complete") {
+  if (tab.url !== undefined && changeinfo.status == "complete") {
     updatePopup();
   }
 });
@@ -62,13 +56,13 @@ function fetchASDatabase(){
   fetch(AS_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
-      ASdatabase = data;
+      //ASdatabase = data;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
-      for (let i = 0; i < ASdatabase.length; i++){
-        ASdatabase[i].urlarray = ASdatabase[i].url.split(".");
-      }
-      chrome.storage.local.set({ "ASdatabase" : ASdatabase }, function(){
-        console.log("Storing allsides database into storage with length of:" + ASdatabase.length);
+      //for (let i = 0; i < ASdatabase.length; i++){
+      //  ASdatabase[i].urlarray = ASdatabase[i].url.split(".");
+      //}
+      chrome.storage.local.set({ "ASdatabase" : data }, function(){
+        console.log("Storing allsides database into storage with length of:" + data.length);
       });
     });
 }
@@ -88,30 +82,30 @@ function fetchMBFCDatabase(){
   };
   fetch(MBFC_API_URL, options)
     .then((response) => response.json())
-    .then((MBFCdata) => {
-      MBFCdatabase = MBFCdata;
+    .then((data) => {
+      //MBFCdatabase = MBFCdata;
       //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
-      for (let i = 0; i < MBFCdatabase.length; i++){
-        if(MBFCdatabase[i].url){
-          var ass = MBFCdatabase[i].url.split("/")
-        }
-        if (ass[2]){
-          ass = ass[2].split(".")
-        }
-        MBFCdatabase[i].urlarray = ass;
-      }
-      chrome.storage.local.set({ "MBFCdatabase" : MBFCdatabase }, function(){
-        console.log("Storing MBFC database into storage with length of:" + MBFCdatabase.length);
+      //for (let i = 0; i < MBFCdatabase.length; i++){
+      //  if(MBFCdatabase[i].url){
+      //    var ass = MBFCdatabase[i].url.split("/")
+      //  }
+      //  if (ass[2]){
+      //    ass = ass[2].split(".")
+      //  }
+      //  MBFCdatabase[i].urlarray = ass;
+      //}
+      chrome.storage.local.set({ "MBFCdatabase" : data }, function(){
+        console.log("Storing MBFC database into storage with length of:" + data.length);
       });
     });
 }
 //update the popup with the current information available on the active tab
 async function updatePopup(){
-    let ASDatabaseHelper = new Database();
+    let ASDatabaseHelper = new DatabaseHelper();
     let obj = await chrome.storage.local.get("ASdatabase")
     ASDatabaseHelper.database = obj.ASdatabase;
 
-    let MBFCDatabaseHelper = new Database();
+    let MBFCDatabaseHelper = new DatabaseHelper();
     obj = await chrome.storage.local.get("MBFCdatabase");
     MBFCDatabaseHelper.database = obj.MBFCdatabase;
     
@@ -120,12 +114,24 @@ async function updatePopup(){
 
     let ASsearch = ASDatabaseHelper.search(currentTabUrl)
     let MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
-    await chrome.storage.local.set({ 'popup':ASsearch, 'MBFCpopup':MBFCsearch},() => {
+
+    if(!MBFCsearch){
+      updatePopupIcon(ASsearch);  
+    }
+    else{
+      updatePopupIcon(MBFCsearch);
+    }
+
+    if(ASsearch  === undefined){
+      ASsearch = "no data"
+    }
+    if(MBFCsearch  === undefined){
+      MBFCsearch = "no data"
+    }
+
+    await chrome.storage.local.set({ 'ASPopupData':ASsearch, 'MBFCPopupData':MBFCsearch},() => {
       console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
     });
-
-    updatePopupIcon(ASsearch);
-    updatePopupIcon(MBFCsearch);
 }
 //javascript object that is a hash map of different political bias and thier respective icons
 const iconMap = {
@@ -144,14 +150,23 @@ const iconMap = {
 //update the popup icon with the bias of the current site you are viewing.
 function updatePopupIcon(source){
   if(source){
-    if(iconMap?.[source.bias])
-      chrome.action.setIcon({ "path": iconMap[source.bias]});
-    else{
-      chrome.action.setIcon({ "path": "icons/unknown.png"});
-    }
+    chrome.action.setIcon({ "path": iconMap?.[source.bias]});
+  }
+  else{
+    chrome.action.setIcon({ "path": "icons/unknown.png"});
   }
 }
 
+// everything after this block will be deleted
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/*
 //listener event: runs when the bias-tooltip.js content script sends a message requesting bias information for an array of urls.
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -181,7 +196,7 @@ chrome.runtime.onMessage.addListener(
       sendResponse({"data": response});
   }
 );
-
+*/
 //find AS profile based on a url
 function findASSource(url_query){
   if(typeof options !== "undefined" && options !== null){

@@ -1,12 +1,21 @@
 let nodata = document.getElementById("no-data");
+let ASprofile = document.getElementById("AS");
+let MBFCprofile = document.getElementById("MBFC");
 
-chrome.storage.local.get("popup", function(obj) {
-  var ASdata = obj.popup;
-  //is AS data in popup storage is not "no data", create the HTML elements and add it to the popup
-  if (ASdata !== "no data"){
+generateASPopup()
+generateMBFCPopup()
+
+async function generateASPopup(){
+  //get allsides data from storage
+  let obj = await chrome.storage.local.get("ASPopupData")
+  ASdata = obj.ASPopupData
+  //if the data in storage states "no data", hide the allsides element in the popup, otherwise generate the allsides element
+  if(ASdata === "no data"){
+    ASprofile.setAttribute("style","display:none;");
+  }
+  else{
     nodata.setAttribute("style","display:none;");
-    let ASprofile = document.getElementById("AS");
-
+    //create allsides icon with link to allsides profile
     let link = document.createElement("a")
     link.setAttribute("href",ASdata.allsidesurl);
     link.setAttribute("target","_blank");
@@ -16,24 +25,23 @@ chrome.storage.local.get("popup", function(obj) {
     element.setAttribute("style","max-width: 150px;")
     link.appendChild(element)
     ASprofile.append(link)
-
+    //create title of news source
     element = document.createElement("h2")
     element.innerHTML = ASdata.name
     element.setAttribute("style","text-align: center")
     ASprofile.append(element)
-
+    //create political bias header
     element = document.createElement("h3")
     element.innerHTML = "Political Bias: " + ASdata.bias
     ASprofile.append(element)
-
+    //create confidence level header
     element = document.createElement("h3")
     element.innerHTML = "Confidence Level: " + ASdata.confidence
     ASprofile.append(element)
-
+    //create community votes section
     element = document.createElement("h3")
     element.innerHTML = "Community Votes:"
     ASprofile.append(element)
-
     var total = parseInt(ASdata.agreement) + parseInt(ASdata.disagreement);
     var agreementPercent = (parseInt(ASdata.agreement)/total) * 100;
     var disagreementPercent = (parseInt(ASdata.disagreement)/total) * 100;
@@ -47,25 +55,25 @@ chrome.storage.local.get("popup", function(obj) {
     votes.appendChild(agreement);
     votes.appendChild(disagreement);
     ASprofile.append(votes)
-
+    //create new lines and horizantal line for ending element
     element = document.createElement("br")
     ASprofile.append(element) 
     element = document.createElement("br")
     ASprofile.append(element) 
     element = document.createElement("hr")
-    ASprofile.append(element) 
-  }
-  else { 
-    //do nothing
-  }
-});
+    ASprofile.append(element)
+  } 
+}
 
-chrome.storage.local.get("MBFCpopup", function(obj) {
-  var MBFCdata = obj.MBFCpopup;
-  //is MBFC data in popup storage is not "no data", create the HTML elements and add it to the popup
-  if (MBFCdata !== ("no data")){
+async function generateMBFCPopup(){
+  let obj = await chrome.storage.local.get("MBFCPopupData")
+  MBFCdata = obj.MBFCPopupData
+  
+  if(MBFCdata === "no data"){
+    MBFCprofile.setAttribute("style","display:none;");
+  }
+  else{
     nodata.setAttribute("style","display:none;");
-    let MBFCprofile = document.getElementById("MBFC");
 
     let link = document.createElement("a")
     link.setAttribute("href",MBFCdata.profile);
@@ -89,21 +97,17 @@ chrome.storage.local.get("MBFCpopup", function(obj) {
     element = document.createElement("h3")
     element.innerHTML = "Factual Reporting: " + MBFCdata.factual
     MBFCprofile.append(element)
-
+    
     element = document.createElement("h3")
     element.innerHTML = "Credibility Rating: " + MBFCdata.credibility
     MBFCprofile.append(element) 
 
     element = document.createElement("hr")
-    MBFCprofile.append(element)       
-  }
-  else {
-    //do nothing
-  }
-});
+    MBFCprofile.append(element)
+  }       
+}
 
-//following is exceuted once the popup html has loaded. 
-//Here event listeners are added to buttons redirect you to a new tab based on what they click
+//Event listeners for buttons to redirect you to a new tab based on what they click
 document.addEventListener('DOMContentLoaded', function () {
   var settingsButton = document.getElementById('options');
   settingsButton.addEventListener('click', function () {

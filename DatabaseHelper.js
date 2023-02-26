@@ -1,6 +1,6 @@
 // script file contains Database classes that will help find results from AS and MBFC databases.
 
-class Database{
+class DatabaseHelper{
   constructor(){
     this.database = []
   }
