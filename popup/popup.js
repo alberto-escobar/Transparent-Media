@@ -21,7 +21,7 @@ async function generateASPopup(){
     link.setAttribute("target","_blank");
     link.setAttribute("title","Click here to go to the Allsides profile");
     let element = document.createElement("img")
-    element.setAttribute("src","icons/allsideslogo.png")
+    element.setAttribute("src","../icons/allsideslogo.png")
     element.setAttribute("style","max-width: 150px;")
     link.appendChild(element)
     ASprofile.append(link)
@@ -80,7 +80,7 @@ async function generateMBFCPopup(){
     link.setAttribute("target","_blank");
     link.setAttribute("title","Click here to go to the MBFC profile");
     let element = document.createElement("img")
-    element.setAttribute("src","icons/MBFClogo.png")
+    element.setAttribute("src","../icons/MBFClogo.png")
     element.setAttribute("style","max-width: 150px;")
     link.appendChild(element)
     MBFCprofile.append(link)
@@ -111,7 +111,7 @@ async function generateMBFCPopup(){
 document.addEventListener('DOMContentLoaded', function () {
   var settingsButton = document.getElementById('options');
   settingsButton.addEventListener('click', function () {
-    var url = "chrome-extension://" + chrome.runtime.id + "/options.html";
+    var url = "chrome-extension://" + chrome.runtime.id + "/options/options.html";
     chrome.tabs.create({ url });
   });
   

@@ -1,5 +1,16 @@
-//importing external secript
-try { importScripts("DatabaseHelper.js"); } catch (e) { console.log(e); }
+//importing external script
+//try { importScripts("DatabaseHelper.js"); } catch (e) { console.log(e); }
+//online solution
+// proper initialization
+if( 'function' === typeof importScripts) {
+  importScripts('libraries/DatabaseHelper.js');
+  addEventListener('message', onMessage);
+
+  function onMessage(e) { 
+    console.log(e);
+  }    
+}
+
 
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";

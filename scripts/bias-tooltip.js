@@ -4,6 +4,12 @@ chrome.storage.local.get("options", function(obj) {
   options = obj.options;
 });
 
+populateCurrentTab();
+
+async function populateCurrentTab(){
+
+}
+
 //main function that runs this content script. If the current URL has no data from allsides or MBFC on it, 
 //it will send an array of URLs present on the active tab to the background script to query and wait for a reply.
 chrome.runtime.sendMessage({"data": [{"href":location.href, "bias": "no data"}]}, function(response) {
