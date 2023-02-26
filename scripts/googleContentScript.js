@@ -34,8 +34,14 @@ async function runContentScript(){
 
   //iterate through list and find ratings for each href
   for(var i = 0;i < hrefList.length;i++){
-    let ASsearch = ASDatabaseHelper.search(hrefList[i].href);
-    let MBFCsearch = MBFCDatabaseHelper.search(hrefList[i].href);
+    let ASsearch
+    let MBFCsearch
+    if(options.ASData){
+      ASsearch = ASDatabaseHelper.search(hrefList[i].href)
+    }
+    if(options.MBFCData){
+      MBFCsearch = MBFCDatabaseHelper.search(hrefList[i].href)
+    }
     hrefList[i].ASbias = ASsearch?.bias
     hrefList[i].MBFCbias = MBFCsearch?.bias
     hrefList[i].MBFCfactual = MBFCsearch?.factual

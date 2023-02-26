@@ -1,7 +1,6 @@
 //importing external script
 try { importScripts("libraries/DatabaseHelper.js"); } catch (e) { console.log(e); }
 
-
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
@@ -41,9 +40,8 @@ chrome.tabs.onActivated.addListener(() => {
   updatePopup();
 });
 
-//fetchDatabase(): Fetches allsides data gatheters on allsides api and assignes it to the database array in memory.
+//fetchASDatabase(): Fetches allsides.com data from political bias database api.
 function fetchASDatabase(){
-  //parameters for the GET request
   const options = {
     method: "GET",
     headers: {
@@ -57,20 +55,14 @@ function fetchASDatabase(){
   fetch(AS_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
-      //ASdatabase = data;
-      //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
-      //for (let i = 0; i < ASdatabase.length; i++){
-      //  ASdatabase[i].urlarray = ASdatabase[i].url.split(".");
-      //}
       chrome.storage.local.set({ "ASdatabase" : data }, function(){
         console.log("Storing allsides database into storage with length of:" + data.length);
       });
     });
 }
 
-//fetchDatabase(): Fetches allsides data gatheters on allsides api and assignes it to the database array in memory.
+//fetchMBFCDatabase(): Fetches mediabiasfactcheck.com data from political bias database api.
 function fetchMBFCDatabase(){
-  //parameters for the GET request
   const options = {
     method: "GET",
     headers: {
@@ -84,37 +76,31 @@ function fetchMBFCDatabase(){
   fetch(MBFC_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
-      //MBFCdatabase = MBFCdata;
-      //iterate through the database and make a new property for each object that is the domain name broken up by the periods. This is to help with search for websites.
-      //for (let i = 0; i < MBFCdatabase.length; i++){
-      //  if(MBFCdatabase[i].url){
-      //    var ass = MBFCdatabase[i].url.split("/")
-      //  }
-      //  if (ass[2]){
-      //    ass = ass[2].split(".")
-      //  }
-      //  MBFCdatabase[i].urlarray = ass;
-      //}
       chrome.storage.local.set({ "MBFCdatabase" : data }, function(){
         console.log("Storing MBFC database into storage with length of:" + data.length);
       });
     });
 }
-//update the popup with the current information available on the active tab
-async function updatePopup(){
-    let ASDatabaseHelper = new DatabaseHelper();
-    let obj = await chrome.storage.local.get("ASdatabase")
-    ASDatabaseHelper.database = obj.ASdatabase;
 
-    let MBFCDatabaseHelper = new DatabaseHelper();
+//update the popup with the current information available on the active tab
+async function updatePopup(){    
+    let obj = await chrome.storage.local.get("ASdatabase")
+    let ASDatabaseHelper = new DatabaseHelper(obj.ASdatabase);
+
     obj = await chrome.storage.local.get("MBFCdatabase");
-    MBFCDatabaseHelper.database = obj.MBFCdatabase;
+    let MBFCDatabaseHelper = new DatabaseHelper(obj.MBFCdatabase);
     
     currentTab = await chrome.tabs.query({currentWindow: true, active: true});
     currentTabUrl = currentTab[0].url
+    let ASsearch
+    let MBFCsearch
 
-    let ASsearch = ASDatabaseHelper.search(currentTabUrl)
-    let MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
+    if(options.ASData){
+      ASsearch = ASDatabaseHelper.search(currentTabUrl)
+    }
+    if(options.MBFCData){
+      MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
+    }
 
     if(!MBFCsearch){
       updatePopupIcon(ASsearch);  

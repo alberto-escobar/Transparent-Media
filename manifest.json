@@ -11,15 +11,15 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["libraries/DatabaseHelper.js","scripts/bias-tooltip.js"],
+      "js": ["libraries/DatabaseHelper.js","scripts/googleContentScript.js"],
       "run_at": "document_end"
     }
   ],
 
   "permissions": [
-    "storage", 
-    "tabs",
-    "unlimitedStorage"
+    "storage",
+    "unlimitedStorage",
+    "tabs"
   ],
 
   "action": {
