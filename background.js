@@ -1,5 +1,6 @@
 //importing external script
 try { importScripts("libraries/DatabaseHelper.js"); } catch (e) { console.log(e); }
+try { importScripts("libraries/Metrics.js"); } catch (e) { console.log(e); }
 
 //use rapid api endpoint to track users
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
@@ -7,9 +8,10 @@ const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.c
 
 //listener event: Updates the database in memory when the extension is first installed.
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("News Bias Reporter extension is installed!");
-  options = {"tooltips": true, "stickers":true, "ASData":true, "MBFCData":true};
+  console.log("Transparent Media is installed!");
+  let options = {"tooltips": true, "stickers":true, "ASData":true, "MBFCData":true};
   chrome.storage.local.set({ "options":options });
+  chrome.storage.local.set({ "logs":[] });
   fetchASDatabase();
   fetchMBFCDatabase();
 });
@@ -96,6 +98,11 @@ async function updatePopup(){
     if(options.MBFCData){
       MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
     }
+    let date = new Date()
+    date = date.toISOString().split("T")[0].replaceAll("-","")
+    let metric = new Metrics(date)
+    await metric.addLog(currentTabUrl,ASsearch,MBFCsearch)
+    await metric.printStoredLogs()
 
     if(!MBFCsearch){
       updatePopupIcon(ASsearch);  
@@ -112,7 +119,7 @@ async function updatePopup(){
     }
 
     await chrome.storage.local.set({ 'ASPopupData':ASsearch, 'MBFCPopupData':MBFCsearch},() => {
-      console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
+      //console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
     });
 }
 //javascript object that is a hash map of different political bias and thier respective icons
@@ -137,4 +144,8 @@ function updatePopupIcon(source){
   else{
     chrome.action.setIcon({ "path": "icons/unknown.png"});
   }
+}
+
+async function recordHistory(url, AS, MBFC){
+  
 }
