@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var stickersCheckbox = document.querySelector('#stickers');
     var ASCheckbox = document.querySelector('#useAS');
     var MBFCCheckbox = document.querySelector('#useMBFC');
+    var historyCheckbox = document.querySelector('#enableHistory');
+    var collectionCheckbox = document.querySelector('#enableCollection');
     var options;
 
     //get options from storage and set the checkboxes to the correct state
@@ -13,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
       stickersCheckbox.checked = options.stickers;
       ASCheckbox.checked = options.ASData;
       MBFCCheckbox.checked = options.MBFCData;
+      historyCheckbox.checked = options.a;
+      collectionCheckbox.checked = options.b;
     });
 
     //if tooltips checkbox is changed, update the options in storage
@@ -22,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         options.tooltips = false;
       }
-      console.log(options);
+
       chrome.storage.local.set({ "options":options });
     });
 
@@ -33,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         options.stickers = false;
       }
-      console.log(options);
+
       chrome.storage.local.set({ "options":options });
     });
 
@@ -44,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         options.ASData = false;
       }
-      console.log(options);
+
       chrome.storage.local.set({ "options":options });
     });
 
@@ -55,7 +59,31 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         options.MBFCData = false;
       }
-      console.log(options);
+
+      chrome.storage.local.set({ "options":options });
+    });
+
+    
+    //if MBFC data checkbox is changed, update the options in storage
+    historyCheckbox.addEventListener('change', function () {
+      if (historyCheckbox.checked) {
+        options.a = true;
+      } else {
+        options.a = false;
+      }
+
+      chrome.storage.local.set({ "options":options });
+    });
+
+    
+    //if MBFC data checkbox is changed, update the options in storage
+    collectionCheckbox.addEventListener('change', function () {
+      if (collectionCheckbox.checked) {
+        options.b = true;
+      } else {
+        options.b = false;
+      }
+
       chrome.storage.local.set({ "options":options });
     });
 

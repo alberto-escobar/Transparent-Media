@@ -9,9 +9,8 @@ const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.c
 //listener event: Updates the database in memory when the extension is first installed.
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Transparent Media is installed!");
-  let options = {"tooltips": true, "stickers":true, "ASData":true, "MBFCData":true};
+  let options = {"tooltips": true, "stickers":true, "ASData":true, "MBFCData":true, "a":true, "b":true};
   chrome.storage.local.set({ "options":options });
-  chrome.storage.local.set({ "logs":[] });
   fetchASDatabase();
   fetchMBFCDatabase();
 });
@@ -88,7 +87,7 @@ async function updatePopup(){
     let MBFCDatabaseHelper = new DatabaseHelper(obj.MBFCdatabase);
     
     currentTab = await chrome.tabs.query({currentWindow: true, active: true});
-    currentTabUrl = currentTab[0].url
+    currentTabUrl = currentTab[0]?.url
     let ASsearch
     let MBFCsearch
 
@@ -98,11 +97,9 @@ async function updatePopup(){
     if(options.MBFCData){
       MBFCsearch = MBFCDatabaseHelper.search(currentTabUrl)
     }
-    let date = new Date()
-    date = date.toISOString().split("T")[0].replaceAll("-","")
-    let metric = new Metrics(date)
+
+    let metric = new Metrics(options)
     await metric.addLog(currentTabUrl,ASsearch,MBFCsearch)
-    await metric.printStoredLogs()
 
     if(!MBFCsearch){
       updatePopupIcon(ASsearch);  
