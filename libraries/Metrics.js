@@ -17,18 +17,18 @@ class Metrics{
         if(!AS&&!MBFC){
             return;
         }
-        
+        let urlHash = this.hash(url); //hash url here, I do not want to save sensitive information
         let currentDayHistory = this.logs[this.logs.length-1].history
         for(var i = 0; i < currentDayHistory.length; i++){
-            if(currentDayHistory[i].article === url){
+            if(currentDayHistory[i].articleHash === urlHash){
                 return;
             }
         } 
 
         let log = {
-            "article":url,
+            "articleHash":urlHash,
             "ASbias":AS?.bias,
-            "MCFCbias":MBFC?.bias,
+            "MBFCbias":MBFC?.bias,
             "MBFCfactual":MBFC?.factual,
         }
  
@@ -74,14 +74,11 @@ class Metrics{
         }
         await chrome.storage.local.set({"lastDate":this.currentDate})
         await this.fetchToken()
-        fetch("https://api64.ipify.org?format=json")
-        .then((response) => response.json())
-        .then((data) => {
-            let packet = { "token":this.token, "ip":data.ip, "logs":this.logs}
-            console.log("packet to be sent:")
-            console.log(packet)
-            //request sending data
-        });
+        let packet = { "token":this.token, "logs":this.logs}
+        console.log("packet to be sent:")
+        console.log(packet)
+        //request sending data
+        //fetch("political-bias-database-api.fly.dev/extension/experiment", {method: "POST", headers: {Accept: "application/json", "Content-Type": "application/json;charset=UTF-8","url": AS_API_URL,}, body: {data:this.logs}}).then((res) => console.log(res.status))
     }
     async printStoredLogs(){
         let obj = await chrome.storage.local.get( "logs" );
@@ -98,5 +95,19 @@ class Metrics{
             this.token = Math.floor(Math.random() * 4000000000)
             await chrome.storage.local.set({ "token":this.token });
         }
+    }
+
+    hash(string){
+        //set variable hash as 0
+        var hash = 0;
+        // if the length of the string is 0, return 0
+        if (string.length == 0) return hash;
+        for (let i = 0 ;i<string.length ; i++)
+        {
+            let ch = string.charCodeAt(i);
+            hash = ((hash << 5) - hash) + ch;
+            hash = hash & hash;
+        }
+        return hash;
     }
 }

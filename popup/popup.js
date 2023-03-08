@@ -129,5 +129,11 @@ document.addEventListener('DOMContentLoaded', function () {
   albertoButton.addEventListener('click', function () {
     chrome.tabs.create({ url:"https://alberto-escobar.github.io/" });
   });
+
+  var historyButton = document.getElementById('history');
+  historyButton.addEventListener('click', function () {
+    var url = "chrome-extension://" + chrome.runtime.id + "/history/history.html";
+    chrome.tabs.create({ url });
+  });
 });
 

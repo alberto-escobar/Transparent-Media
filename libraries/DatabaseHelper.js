@@ -10,7 +10,7 @@ class DatabaseHelper{
     //of the url being queried. If yes, push the profile on to the matches array.
     let matches = [];
     for (let i = 0; i < this.database.length; i++){
-      if(url.includes(this.database[i].url)){
+      if(url?.includes(this.database[i].url)){
         matches.push(this.database[i])
       }
     }
