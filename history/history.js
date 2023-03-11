@@ -1,34 +1,173 @@
-//get the data from storage
-//process it to make a daily tally of various markers (ASbias, MBFCbias, CombinedBias, and MBFCfactual)
-//if one article has disagreeing MBFC and ASbias data, add half points to respective categories
-//write data to html element
+import "./chart.min.js"
 
-//data visualisation
-//Date      Articles Read                  Average Bias                Average Factual Reporting           Misc Categories also viewed
-//20230801     1                           L [LL] C  LR  R             |  Low  | [Mostly] |  High          Conspiracy:1 | Pro-science:5 | Satire:2
-//20230801     5                                                          L  LL  C  LR  R             |  Low  |  Mostly  |  High          N/A (if zero, don't show, if all zero, show N/A)
+document.addEventListener('DOMContentLoaded', function () {
+    main()
+});
 
-//instead of average, you could do a heat map using opacity.
+async function main(){
+    let obj = await chrome.storage.local.get("logs");
+    let logs = processLogs(obj.logs)
+    let chartData = generateChartData(logs,25)
 
-//load hs history
-//process it
-// make elements
+    new Chart("categoryChart", {
+        type: 'pie',
+        data: {
+            labels:[
+                "News",
+                "Pro-Science",
+                "Satire",
+                "Conspiracy"
+            ],
+            datasets: [{
+                data: [
+                    chartData["news"], 
+                    chartData["pro-science"], 
+                    chartData["satire"], 
+                    chartData["conspiracy"],
+                ],
+                backgroundColor: [
+                    "lightsalmon",
+                    "green",
+                    "yellowgreen",
+                    "black"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "left"
+                },
+            },
+        
+        }
+    });
 
-function processLogs(logs){
-    let history = []
-    for(let i = 0; i < logs.length; i++){
-        history.push(processDay(logs[i]))
-    }
-    return history;
+    new Chart("biasChart", {
+        type: 'bar',
+        data: {
+            labels:["Bias"],
+            datasets: [
+                {
+                    label:'Left',
+                    data:[chartData["left"]],
+                    backgroundColor:"blue"
+                },
+                {
+                    label:'Lean Left',
+                    data:[chartData["left-center"]],
+                    backgroundColor:"lightblue"
+                },
+                {
+                    label:'Center',
+                    data:[chartData["center"]],
+                    backgroundColor:"purple"
+                },
+                {
+                    label:'Lean Right',
+                    data:[chartData["right-center"]],
+                    backgroundColor:"lightcoral"
+                },{
+                    label:'Right',
+                    data:[chartData["right"]],
+                    backgroundColor:"red"
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: "left"
+                },
+            },
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: {
+                    display: false,
+                    stacked: true,
+                },
+                y: {
+                    display: false,
+                    stacked: true
+                }
+            }
+        },
+    });
+
+    var bar_ctx = document.getElementById('factualChart').getContext('2d');
+    var background_1 = bar_ctx.createLinearGradient(0, 0, 1000, 0);
+    background_1.addColorStop(0, 'red');
+    background_1.addColorStop(0.5, 'orange');       
+    background_1.addColorStop(1, 'green');       
+    
+    new Chart("factualChart", {
+        data: {
+            datasets: [
+                {
+                    type: 'line',
+                    label:'Factual',
+                    data:[chartData["average factual score"]],
+                    radius:50,
+                    pointStyle:"line",
+                    rotation:"90",
+                    backgroundColor:"black",
+                    borderWidth:5,
+                    borderColor:"black",
+                    hitRadius:50,
+                    hoverRadius:50,
+                    hoverBorderWidth:5
+                },
+                {
+                    type: 'bar',
+                    label: 'Bar Dataset',
+                    data: [6],
+                    backgroundColor:[background_1]
+
+                }
+            ],
+            labels: ['factual']
+        },
+        options:{
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+            },
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: {
+                    min: 0,
+                    max: 6,
+                },
+                y: {
+                    display: false,
+                }
+            }
+        }
+    });
 }
 
-function processDay(dayLog){
+function processLogs(logs){
+    let processedLogs = []
+    for(let i = 0; i < logs.length; i++){
+        processedLogs.push(processLog(logs[i]))
+    }
+    return processedLogs;
+}
+
+function processLog(dayLog){
     let date = dayLog.date
     let history = dayLog.history
 
     let bias = ["left", "left-center", "center", "right-center", "right"]
-    let tally = {
-        "date":date,
+    let processedLog = {
+        "date":parseInt(date),
         "articles":history.length,
         "left":0,
         "left-center":0,
@@ -49,82 +188,52 @@ function processDay(dayLog){
 
     for(let i = 0; i < history.length; i++){
         if(history[i].ASbias && history[i].MBFCbias && bias.includes(history[i].MBFCbias)){
-            tally[history[i].ASbias] += 0.5
-            tally[history[i].MBFCbias] += 0.5
-            tally[history[i].MBFCfactual] += 1
+            processedLog[history[i].ASbias] += 0.5
+            processedLog[history[i].MBFCbias] += 0.5
+            processedLog[history[i].MBFCfactual] += 1
         }
         else{
-            tally[history[i].ASbias] += 1
-            tally[history[i].MBFCbias] += 1
-            tally[history[i].MBFCfactual] += 1
+            processedLog[history[i].ASbias] += 1
+            processedLog[history[i].MBFCbias] += 1
+            processedLog[history[i].MBFCfactual] += 1
         }
     }
-    return tally
+    return processedLog;
 }
-function populateTable(logs){
-    let table = document.getElementById("table")
-    for (let i = 0; i < logs.length; i++){
-        let row = document.createElement("tr")
-        
-        let cell = document.createElement("td")
-        cell.innerHTML = logs[i].date
-        row.append(cell)
 
-        cell = document.createElement("td")
-        cell.innerHTML = logs[i].articles
-        row.append(cell)
-
- 
-        generateBiasHeatMap(logs[i],row)
-
-        //Factual Heat Map
-
-        //tags
-
-        table.append(row)
+function generateChartData(processedLogs, period){
+    if (period > processedLogs.length){
+        period = processedLogs.length
     }
+    //sort logs, most recent first
+    processedLogs.sort((l1, l2) => (l1.date < l2.date) ? 1 : (l1.date > l2.date) ? -1 : 0);
+    //iterate with for loop and add all metrics
+    let chartData = processedLogs[0]
+    delete chartData.date
+    for(let i = 1; i < period; i++){
+        
+        chartData["articles"] += processedLogs[i]["articles"]
+        chartData["left"] += processedLogs[i]["left"]
+        chartData["left-center"] += processedLogs[i]["left-center"]
+        chartData["center"] += processedLogs[i]["center"]
+        chartData["right-center"] += processedLogs[i]["right-center"]
+        chartData["right"] += processedLogs[i]["right"]
+        chartData["very low"] += processedLogs[i]["very low"]
+        chartData["low"] += processedLogs[i]["low"]
+        chartData["mixed"] += processedLogs[i]["mixed"]
+        chartData["mostly"] += processedLogs[i]["mostly"]
+        chartData["high"] += processedLogs[i]["high"]
+        chartData["very high"] += processedLogs[i]["very high"]
+        chartData["satire"] += processedLogs[i]["satire"]
+        chartData["pro-science"] += processedLogs[i]["pro-science"]
+        chartData["conspiracy"] += processedLogs[i]["conspiracy"]
+    }
+    //calculate averageFactualReporting
+    let total = chartData["very low"] + chartData["low"] + chartData["mixed"] + chartData["mostly"] + chartData["high"] + chartData["very high"]
+    let totalScore = chartData["very low"]*0 + chartData["low"]*1 + chartData["mixed"]*2 + chartData["mostly"]*3 + chartData["high"]*4 + chartData["very high"]*5
+    chartData["average factual score"] = totalScore/total
+
+    //calculate number of news articles (total of bias)
+    chartData["news"] = chartData["left"] + chartData["left-center"] + chartData["center"] + chartData["right-center"] + chartData["right"]
+    return chartData
 }
-
-function generateBiasHeatMap(log, row){
-    total = Math.max(log["left"],log["left-center"],log["center"],log["right-center"],log["right"])
-    
-    let cell = document.createElement("td")
-    cell.innerHTML = "Left"
-    cell.setAttribute("style","background-color: blue;color: white; opacity: "+ (log["left"]/total||0.05))
-    cell.setAttribute("title",log["left"]+" article")
-    row.append(cell)
-
-    cell = document.createElement("td")
-    cell.innerHTML = "Lean<br>Left"
-    cell.setAttribute("style","background-color: lightblue;color: white; opacity: "+ (log["left-center"]/total||0.05))
-    cell.setAttribute("title",log["left-center"]+" article")
-    row.append(cell)
-
-    cell = document.createElement("td")
-    cell.innerHTML = "Center"
-    cell.setAttribute("style","background-color: purple;color: white; opacity: "+ (log["center"]/total||0.05))
-    cell.setAttribute("title",log["center"]+" article")
-    row.append(cell)
-
-    cell = document.createElement("td")
-    cell.innerHTML = "Lean<br>Right"
-    cell.setAttribute("style","background-color: lightcoral;color: white; opacity: "+ (log["right-center"]/total||0.05))
-    cell.setAttribute("title",log["right-center"]+" article")
-    row.append(cell)
-
-    cell = document.createElement("td")
-    cell.innerHTML = "Right"
-    cell.setAttribute("style","background-color: red;color: white; opacity: "+ (log["right"]/total||0.05))
-    cell.setAttribute("title",log["right"]+" article")
-    row.append(cell)
-}
-async function main(){
-    let obj = await chrome.storage.local.get("logs");
-    let logs = processLogs(obj.logs)
-    console.log(logs)
-    populateTable(logs)
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    main()
-});

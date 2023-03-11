@@ -55,6 +55,7 @@ class Metrics{
             if(this.logs[this.logs.length-1].date !== this.currentDate){
                 this.logs.push(newLog)
             }
+            //TODO if log longer then 30 days delete earlist entry
         }
         await this.saveLogs()
     }
