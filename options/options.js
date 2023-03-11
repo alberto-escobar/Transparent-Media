@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var MBFCCheckbox = document.querySelector('#useMBFC');
     var historyCheckbox = document.querySelector('#enableHistory');
     var collectionCheckbox = document.querySelector('#enableCollection');
+    var deleteHistory = document.querySelector("#deleteHistory");
     var options;
 
     //get options from storage and set the checkboxes to the correct state
@@ -68,8 +69,12 @@ document.addEventListener('DOMContentLoaded', function () {
     historyCheckbox.addEventListener('change', function () {
       if (historyCheckbox.checked) {
         options.a = true;
+        collectionCheckbox.checked = true;
+        options.b = true;
       } else {
         options.a = false;
+        collectionCheckbox.checked = false;
+        options.b = false;
       }
 
       chrome.storage.local.set({ "options":options });
@@ -86,5 +91,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       chrome.storage.local.set({ "options":options });
     });
-
+    
+    deleteHistory.addEventListener ("click", function() {
+      const response = confirm("Are you sure you want to delete your ratings history?");
+      if (response) {
+        chrome.storage.local.set({"logs":[]},() => {
+          alert("Ratings history deleted.")
+        });
+      }
+    });
   });

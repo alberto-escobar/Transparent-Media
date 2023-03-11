@@ -55,7 +55,10 @@ class Metrics{
             if(this.logs[this.logs.length-1].date !== this.currentDate){
                 this.logs.push(newLog)
             }
-            //TODO if log longer then 30 days delete earlist entry
+            if(this.logs.length > 180){
+                this.logs.shift()
+                
+            }
         }
         await this.saveLogs()
     }
@@ -71,16 +74,33 @@ class Metrics{
         //check if data has been sent today, if 
         let obj = await chrome.storage.local.get("lastDate")
         if(obj?.lastDate === this.currentDate){
-            return;
+            //return;
         }
         await chrome.storage.local.set({"lastDate":this.currentDate})
         await this.fetchToken()
         let packet = { "token":this.token, "logs":this.logs}
         console.log("packet to be sent:")
         console.log(packet)
+
         //request sending data
-        //fetch("political-bias-database-api.fly.dev/extension/experiment", {method: "POST", headers: {Accept: "application/json", "Content-Type": "application/json;charset=UTF-8","url": AS_API_URL,}, body: {data:this.logs}}).then((res) => console.log(res.status))
+        const api = "https://political-bias-database-api.fly.dev/extension/experiment"
+        const options = {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json;charset=UTF-8",
+            "url": api,
+          },
+          body: JSON.stringify(packet)
+        };
+        fetch("https://political-bias-database-api.fly.dev/extension/experiment", options)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          });
+
     }
+
     async printStoredLogs(){
         let obj = await chrome.storage.local.get( "logs" );
         console.log("Logs currently in storage:")

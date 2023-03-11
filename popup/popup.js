@@ -114,21 +114,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var url = "chrome-extension://" + chrome.runtime.id + "/options/options.html";
     chrome.tabs.create({ url });
   });
-  
-  var allsidesButton = document.getElementById('allsides');
-  allsidesButton.addEventListener('click', function () {
-    chrome.tabs.create({ url:"https://www.allsides.com/unbiased-balanced-news" });
-  });
-
-  var MBFCButton = document.getElementById('MBFCsite');
-  MBFCButton.addEventListener('click', function () {
-    chrome.tabs.create({ url:"https://mediabiasfactcheck.com/" });
-  });
-  
-  var albertoButton = document.getElementById('alberto');
-  albertoButton.addEventListener('click', function () {
-    chrome.tabs.create({ url:"https://alberto-escobar.github.io/" });
-  });
 
   var historyButton = document.getElementById('history');
   historyButton.addEventListener('click', function () {

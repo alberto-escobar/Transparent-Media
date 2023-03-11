@@ -96,7 +96,8 @@ async function main(){
         },
     });
 
-    var bar_ctx = document.getElementById('factualChart').getContext('2d');
+    var bar = document.getElementById('factualChart')
+    var bar_ctx = bar.getContext('2d');
     var background_1 = bar_ctx.createLinearGradient(0, 0, 1000, 0);
     background_1.addColorStop(0, 'red');
     background_1.addColorStop(0.5, 'orange');       
@@ -122,7 +123,7 @@ async function main(){
                 {
                     type: 'bar',
                     label: 'Bar Dataset',
-                    data: [6],
+                    data: [5],
                     backgroundColor:[background_1]
 
                 }
@@ -139,11 +140,10 @@ async function main(){
                 },
             },
             indexAxis: 'y',
-            responsive: true,
             scales: {
                 x: {
                     min: 0,
-                    max: 6,
+                    max: 5,
                 },
                 y: {
                     display: false,
@@ -187,7 +187,7 @@ function processLog(dayLog){
     }
 
     for(let i = 0; i < history.length; i++){
-        if(history[i].ASbias && history[i].MBFCbias && bias.includes(history[i].MBFCbias)){
+        if(history[i].ASbias && history[i].MBFCbias){
             processedLog[history[i].ASbias] += 0.5
             processedLog[history[i].MBFCbias] += 0.5
             processedLog[history[i].MBFCfactual] += 1
