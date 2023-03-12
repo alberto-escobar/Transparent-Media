@@ -1,12 +1,12 @@
 history display feature:
-    add drop down menu to select period, should change charts when it changes
-    add button to get raw data
-
-    I CANNOT FUCKING FIX IT fix gradiant issue when resizing
+    fix gradiant issue when resizing (I CANNOT FUKCING FIX)
     precentage instead of numbers for tool tips
-
-    number of articles read
     prettify it
+
+    DONE add drop down menu to select period, should change charts when it changes
+    DONE add button to get raw data
+    DONE number of articles read
+    
 
 options feature :
     DONE delete history option
@@ -15,11 +15,14 @@ options feature :
 
 popup feature:
     make popup pretty
+
     DONE get rid of powered by buttons and developer button
 
 metrics feature:
+    DONE make data pass through rapid api
     DONE make send data work
     DONE delete history after x days pass
+    
 
 backend API:
     process recieved data

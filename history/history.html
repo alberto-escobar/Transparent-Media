@@ -2,9 +2,21 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="history.css">
-        <script type="module" src="history.js"></script>
+        
     </head>
     <body>
+        <label for="period">Choose a period:</label>
+        <select id="period">
+            <option value="1">Past day</option>
+            <option value="7">Past week</option>
+            <option value="30">Past month</option>
+            <option value="90" selected>Past 3 months</option>
+            <option value="180" selected>Past 6 months</option>
+        </select>
+        <span>&emsp;</span>
+        <button id="getRawData" type="button">Get Raw Data</button>
+
+        <h1 id="title">In the X you read # articles!</h1>
         <h1>
             Breakdown of the type of articles you read:
         </h1>
@@ -14,9 +26,9 @@
         </h1>
         <canvas id="biasChart"></canvas>
         <h1>
-            How well cited are the articles you read:
+            Average citation scoring:
         </h1>
         <canvas id="factualChart"></canvas>
-        
+        <script type="module" src="history.js"></script>
     </body> 
 </html>

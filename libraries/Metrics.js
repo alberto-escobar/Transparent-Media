@@ -74,7 +74,7 @@ class Metrics{
         //check if data has been sent today, if 
         let obj = await chrome.storage.local.get("lastDate")
         if(obj?.lastDate === this.currentDate){
-            //return;
+            return;
         }
         await chrome.storage.local.set({"lastDate":this.currentDate})
         await this.fetchToken()
@@ -83,17 +83,19 @@ class Metrics{
         console.log(packet)
 
         //request sending data
-        const api = "https://political-bias-database-api.fly.dev/extension/experiment"
+        const api = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/experiment"
         const options = {
           method: "POST",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json;charset=UTF-8",
             "url": api,
+            'X-RapidAPI-Key': 'c68506b6c4msh761b24c39cc0233p10207cjsnd103f347dfc4',
+            'X-RapidAPI-Host': 'transparent-media-extension-endpoints.p.rapidapi.com'
           },
           body: JSON.stringify(packet)
         };
-        fetch("https://political-bias-database-api.fly.dev/extension/experiment", options)
+        fetch(api, options)
           .then((response) => response.json())
           .then((data) => {
             console.log(data);

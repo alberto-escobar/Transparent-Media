@@ -1,156 +1,45 @@
 import "./chart.min.js"
 
-document.addEventListener('DOMContentLoaded', function () {
-    main()
+let categoryChart
+let biasChart
+let factualChart
+
+let getRawData = document.getElementById("getRawData")
+getRawData.addEventListener("click", (event) => {
+    async function getRaw(){
+        let obj = await chrome.storage.local.get("logs");
+        let logs = processLogs(obj.logs);
+        var win = window.open("", "Title", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
+        win.document.body.innerHTML = "<pre>" + JSON.stringify(logs, null, 2); + "</pre>"
+    }
+    getRaw()
 });
 
-async function main(){
+async function getRaw(){
+    let obj = await chrome.storage.local.get("logs");
+    let logs = processLogs(obj.logs);
+    var win = window.open("", "Title", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
+    win.document.body.innerHTML = "<pre>" + JSON.stringify(logs, null, 2); + "</pre>"
+}
+
+let select = document.getElementById("period")
+select.addEventListener("change", (event) => {
+    categoryChart.destroy()
+    biasChart.destroy()
+    factualChart.destroy()
+    main(select.value)
+});
+
+await main(select.value)
+
+async function main(period){
     let obj = await chrome.storage.local.get("logs");
     let logs = processLogs(obj.logs)
-    let chartData = generateChartData(logs,25)
-
-    new Chart("categoryChart", {
-        type: 'pie',
-        data: {
-            labels:[
-                "News",
-                "Pro-Science",
-                "Satire",
-                "Conspiracy"
-            ],
-            datasets: [{
-                data: [
-                    chartData["news"], 
-                    chartData["pro-science"], 
-                    chartData["satire"], 
-                    chartData["conspiracy"],
-                ],
-                backgroundColor: [
-                    "lightsalmon",
-                    "green",
-                    "yellowgreen",
-                    "black"
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: "left"
-                },
-            },
-        
-        }
-    });
-
-    new Chart("biasChart", {
-        type: 'bar',
-        data: {
-            labels:["Bias"],
-            datasets: [
-                {
-                    label:'Left',
-                    data:[chartData["left"]],
-                    backgroundColor:"blue"
-                },
-                {
-                    label:'Lean Left',
-                    data:[chartData["left-center"]],
-                    backgroundColor:"lightblue"
-                },
-                {
-                    label:'Center',
-                    data:[chartData["center"]],
-                    backgroundColor:"purple"
-                },
-                {
-                    label:'Lean Right',
-                    data:[chartData["right-center"]],
-                    backgroundColor:"lightcoral"
-                },{
-                    label:'Right',
-                    data:[chartData["right"]],
-                    backgroundColor:"red"
-                }
-            ]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    position: "left"
-                },
-            },
-            indexAxis: 'y',
-            responsive: true,
-            scales: {
-                x: {
-                    display: false,
-                    stacked: true,
-                },
-                y: {
-                    display: false,
-                    stacked: true
-                }
-            }
-        },
-    });
-
-    var bar = document.getElementById('factualChart')
-    var bar_ctx = bar.getContext('2d');
-    var background_1 = bar_ctx.createLinearGradient(0, 0, 1000, 0);
-    background_1.addColorStop(0, 'red');
-    background_1.addColorStop(0.5, 'orange');       
-    background_1.addColorStop(1, 'green');       
-    
-    new Chart("factualChart", {
-        data: {
-            datasets: [
-                {
-                    type: 'line',
-                    label:'Factual',
-                    data:[chartData["average factual score"]],
-                    radius:50,
-                    pointStyle:"line",
-                    rotation:"90",
-                    backgroundColor:"black",
-                    borderWidth:5,
-                    borderColor:"black",
-                    hitRadius:50,
-                    hoverRadius:50,
-                    hoverBorderWidth:5
-                },
-                {
-                    type: 'bar',
-                    label: 'Bar Dataset',
-                    data: [5],
-                    backgroundColor:[background_1]
-
-                }
-            ],
-            labels: ['factual']
-        },
-        options:{
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: false
-                },
-            },
-            indexAxis: 'y',
-            scales: {
-                x: {
-                    min: 0,
-                    max: 5,
-                },
-                y: {
-                    display: false,
-                }
-            }
-        }
-    });
+    let chartData = generateChartData(logs,period)
+    createTitle(chartData);
+    createCategoryChart(chartData);
+    createBiasChart(chartData);
+    createFactualChart(chartData);
 }
 
 function processLogs(logs){
@@ -228,6 +117,7 @@ function generateChartData(processedLogs, period){
         chartData["pro-science"] += processedLogs[i]["pro-science"]
         chartData["conspiracy"] += processedLogs[i]["conspiracy"]
     }
+    chartData["period"] = period
     //calculate averageFactualReporting
     let total = chartData["very low"] + chartData["low"] + chartData["mixed"] + chartData["mostly"] + chartData["high"] + chartData["very high"]
     let totalScore = chartData["very low"]*0 + chartData["low"]*1 + chartData["mixed"]*2 + chartData["mostly"]*3 + chartData["high"]*4 + chartData["very high"]*5
@@ -236,4 +126,158 @@ function generateChartData(processedLogs, period){
     //calculate number of news articles (total of bias)
     chartData["news"] = chartData["left"] + chartData["left-center"] + chartData["center"] + chartData["right-center"] + chartData["right"]
     return chartData
+}
+
+function createTitle(chartData){
+    let title = document.getElementById("title")
+    title.innerHTML = "In the past " + chartData["period"] + " days you have read " + chartData["articles"] + " articles!" 
+}
+
+function createCategoryChart(chartData){
+    categoryChart = new Chart("categoryChart", {
+        type: 'pie',
+        data: {
+            labels:[
+                "News",
+                "Pro-Science",
+                "Satire",
+                "Conspiracy"
+            ],
+            datasets: [{
+                data: [
+                    chartData["news"], 
+                    chartData["pro-science"], 
+                    chartData["satire"], 
+                    chartData["conspiracy"],
+                ],
+                backgroundColor: [
+                    "lightsalmon",
+                    "green",
+                    "yellowgreen",
+                    "black"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "left"
+                },
+            },
+        
+        }
+    });
+}
+
+function createBiasChart(chartData){
+    biasChart = new Chart("biasChart", {
+        type: 'bar',
+        data: {
+            labels:["Bias"],
+            datasets: [
+                {
+                    label:'Left',
+                    data:[chartData["left"]],
+                    backgroundColor:"blue"
+                },
+                {
+                    label:'Lean Left',
+                    data:[chartData["left-center"]],
+                    backgroundColor:"lightblue"
+                },
+                {
+                    label:'Center',
+                    data:[chartData["center"]],
+                    backgroundColor:"purple"
+                },
+                {
+                    label:'Lean Right',
+                    data:[chartData["right-center"]],
+                    backgroundColor:"lightcoral"
+                },{
+                    label:'Right',
+                    data:[chartData["right"]],
+                    backgroundColor:"red"
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: "left"
+                },
+            },
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: {
+                    display: false,
+                    stacked: true,
+                },
+                y: {
+                    display: false,
+                    stacked: true
+                }
+            }
+        },
+    });
+}
+
+function createFactualChart(chartData){
+    var bar = document.getElementById('factualChart')
+    var bar_ctx = bar.getContext('2d');
+    var background_1 = bar_ctx.createLinearGradient(0, 0, 1000, 0);
+    background_1.addColorStop(0, 'red');
+    background_1.addColorStop(0.5, 'orange');       
+    background_1.addColorStop(1, 'green');       
+    
+    factualChart = new Chart("factualChart", {
+        data: {
+            datasets: [
+                {
+                    type: 'line',
+                    label:'Factual',
+                    data:[chartData["average factual score"]],
+                    radius:50,
+                    pointStyle:"line",
+                    rotation:"90",
+                    backgroundColor:"black",
+                    borderWidth:5,
+                    borderColor:"black",
+                    hitRadius:50,
+                    hoverRadius:50,
+                    hoverBorderWidth:5
+                },
+                {
+                    type: 'bar',
+                    label: 'Bar Dataset',
+                    data: [5],
+                    backgroundColor:[background_1]
+
+                }
+            ],
+            labels: ['factual']
+        },
+        options:{
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    min: 0,
+                    max: 5,
+                },
+                y: {
+                    display: false,
+                }
+            }
+        }
+    });
 }
