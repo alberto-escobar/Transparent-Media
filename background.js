@@ -72,7 +72,8 @@ function fetchASDatabase(){
         data[i].bias = conversionMap[data[i].bias]
       }
       chrome.storage.local.set({ "ASdatabase" : data }, function(){
-        console.log("Storing allsides database into storage with length of:" + data.length);
+        //debug
+        //console.log("Storing allsides database into storage with length of:" + data.length); 
       });
     });
 }
@@ -97,7 +98,8 @@ function fetchMBFCDatabase(){
         data[i].factual = conversionMap[data[i].factual]
       }
       chrome.storage.local.set({ "MBFCdatabase" : data }, function(){
-        console.log("Storing MBFC database into storage with length of:" + data.length);
+        //debug
+        //console.log("Storing MBFC database into storage with length of:" + data.length); 
       });
     });
 }
@@ -143,6 +145,7 @@ async function updatePopup(){
     }
 
     await chrome.storage.local.set({ 'ASPopupData':ASsearch, 'MBFCPopupData':MBFCsearch},() => {
+      //debug
       //console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
     });
 }

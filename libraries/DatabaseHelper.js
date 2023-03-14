@@ -4,7 +4,6 @@ class DatabaseHelper{
   constructor(database = []){
     this.database = database
   }
-  //test cases 4 test cases
   search(url){
     //iterate through database and check if any url in the database is a substring 
     //of the url being queried. If yes, push the profile on to the matches array.
@@ -14,8 +13,8 @@ class DatabaseHelper{
         matches.push(this.database[i])
       }
     }
-    //iterate through matches, find the biggest in the url in the array and return
-    //that profile as the best matching profile
+    //iterate through matches, find the profile with the biggest url 
+    //and return that profile as the best matching profile
     let bestResult;
     let maxStringSize = 0;
     for (let i = 0; i < matches.length; i++){

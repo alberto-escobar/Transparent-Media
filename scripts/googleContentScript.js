@@ -4,6 +4,25 @@ chrome.storage.local.get("options", function(obj) {
   options = obj.options;
 });
 
+const stickerStyle = {
+  "Left":"background-color:#2c64a4;",
+  "Lean Left":"background-color:#9cccec;",
+  "Center":"background-color:#9464a4;",
+  "All Sides":"background-color:#9464a4;",
+  "Lean Right":"background-color:#cc9c9c;",
+  "Right":"background-color:#cc2424;",
+  "Satire":"background-color:#d3db39;",
+  "Pro-Science":"background-color:#1a9830;",
+  "Fake News":"background-color:#000000;",
+  "Conspiracy":"background-color:#000000;",
+  "Very High":"background-color:#1a9830;",
+  "High":"background-color:#1a9830;",
+  "Moderate":"background-color:#88a81e;",
+  "Mixed":"background-color:#E36C0A;",
+  "Low":"background-color:#FF0000;",
+  "Very Low":"background-color:#FF0000;"
+}
+
 runContentScript();
 
 async function runContentScript(){ 
@@ -85,25 +104,16 @@ function addTooltip(source,aElement){
     }
 }
 
-const factualStickerStyle = {
-  "Very High":"background-color:#1a9830;",
-  "High":"background-color:#1a9830;",
-  "Moderate":"background-color:#88a81e;",
-  "Mixed":"background-color:#E36C0A;",
-  "Low":"background-color:#FF0000;",
-  "Very Low":"background-color:#FF0000;"
-}
-
 function createMBFCFactualSticker (source){
   var factual = source.MBFCfactual;
   var elementType = "span";
   var sticker;
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
-  if(factualStickerStyle?.[factual]){
+  if(stickerStyle?.[factual]){
     sticker = document.createElement(elementType);
     sticker.innerHTML = "Media Bias Fact Check: " + factual + " Sourcing" + "<br>"
     //sticker.innerHTML = sticker.innerHTML + "<br>"
-    sticker.setAttribute("style",factualStickerStyle?.[factual]+style);
+    sticker.setAttribute("style",stickerStyle?.[factual]+style);
     sticker.setAttribute("id",factual);
     return sticker;
   }
@@ -112,28 +122,15 @@ function createMBFCFactualSticker (source){
   }
 }
 
-const biasStickerStyle = {
-  "Left":"background-color:#2c64a4;",
-  "Lean Left":"background-color:#9cccec;",
-  "Center":"background-color:#9464a4;",
-  "All Sides":"background-color:#9464a4;",
-  "Lean Right":"background-color:#cc9c9c;",
-  "Right":"background-color:#cc2424;",
-  "Satire":"background-color:#d3db39;",
-  "Pro-Science":"background-color:#1a9830;",
-  "Fake News":"background-color:#000000;",
-  "Conspiracy":"background-color:#000000;"
-}
-
 function createMBFCBiasSticker (source){
   var bias = source.MBFCbias;
   var elementType = "span";
   var sticker;
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
-  if(biasStickerStyle?.[bias]){
+  if(stickerStyle?.[bias]){
     sticker = document.createElement(elementType);
     sticker.innerHTML = "Media Bias Fact Check: " + bias + " Bias" + "<br>"
-    sticker.setAttribute("style",biasStickerStyle?.[bias]+style);
+    sticker.setAttribute("style",stickerStyle?.[bias]+style);
     sticker.setAttribute("id",bias);
     return sticker;
   }
@@ -149,10 +146,10 @@ function createAllsidesBiasSticker (source){
   var sticker;
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
 
-  if(biasStickerStyle?.[bias]){
+  if(stickerStyle?.[bias]){
     sticker = document.createElement(elementType);
     sticker.innerHTML = "All Sides: " + bias + " bias" + "<br>"
-    sticker.setAttribute("style",biasStickerStyle?.[bias]+style);
+    sticker.setAttribute("style",stickerStyle?.[bias]+style);
     sticker.setAttribute("id",bias);
     return sticker;
   }

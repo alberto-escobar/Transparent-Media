@@ -65,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     
-    //if MBFC data checkbox is changed, update the options in storage
+    //if history checkbox is changed, update the options in storage.
+    //if turned off, data collection turned off as well
     historyCheckbox.addEventListener('change', function () {
       if (historyCheckbox.checked) {
         options.a = true;
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     
-    //if MBFC data checkbox is changed, update the options in storage
+    //if data collection checkbox is changed, update the options in storage
     collectionCheckbox.addEventListener('change', function () {
       if (collectionCheckbox.checked) {
         options.b = true;
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
       chrome.storage.local.set({ "options":options });
     });
     
+    //if clicked delete history logs in storage
     deleteHistory.addEventListener ("click", function() {
       const response = confirm("Are you sure you want to delete your ratings history?");
       if (response) {

@@ -17,22 +17,27 @@
         <span>&emsp;</span>
         <button id="getRawData" type="button">Get Raw Data</button>
         <br><br>
+
         <span>Hover over headings for descriptions.</span>
         <h1 id="title" title="Transparent media records the ratings of articles you read over time to construct the graphs below.">
             In the past ERROR days you have read ERROR articles!
         </h1>
+
         <h2 title="The following chart breakdowns the articles you read into four categories.">
             Breakdown of the type of articles you read:
         </h2>
         <canvas id="categoryChart"></canvas>
+
         <h2 title="The following chart breakdown the news articles you read into five categories on the left-right political spectrum.">
             Breakdown of the media bias you are exposed to:
         </h2>
         <canvas id="biasChart"></canvas>
+
         <h2 title="The following chart provides the average sourcing rating (quality of sourcing material) of the articles you read on a scale of 0 (Very Low) to 5 (Very High).">
             Average sourcing rating:
         </h2>
         <canvas width=1000 id="factualChart"></canvas>
+        
         <script type="module" src="history.js"></script>
     </body> 
 </html>

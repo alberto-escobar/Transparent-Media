@@ -4,24 +4,19 @@ let categoryChart
 let biasChart
 let factualChart
 
+//posts history logs to new window to copy and paste
 let getRawData = document.getElementById("getRawData")
 getRawData.addEventListener("click", (event) => {
     async function getRaw(){
         let obj = await chrome.storage.local.get("logs");
         let logs = processLogs(obj.logs);
         var win = window.open("", "Title", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
-        win.document.body.innerHTML = "<pre>" + JSON.stringify(logs, null, 2); + "</pre>"
+        win.document.body.innerHTML = "<head><title>Raw History Data</title></head><body><pre>" + JSON.stringify(logs, null, 2); + "</pre></body>"
     }
     getRaw()
 });
 
-async function getRaw(){
-    let obj = await chrome.storage.local.get("logs");
-    let logs = processLogs(obj.logs);
-    var win = window.open("", "Title", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
-    win.document.body.innerHTML = "<pre>" + JSON.stringify(logs, null, 2); + "</pre>"
-}
-
+//select period used for chart data
 let select = document.getElementById("period")
 select.addEventListener("change", (event) => {
     categoryChart.destroy()
@@ -30,10 +25,10 @@ select.addEventListener("change", (event) => {
     main(select.value)
 });
 
+//main function used to generate charts
 await main(select.value)
 
 async function main(period){
-    
     let obj = await chrome.storage.local.get("logs");
     let logs = processLogs(obj.logs)
     obj = await chrome.storage.local.get("options");
@@ -123,6 +118,7 @@ function generateChartData(processedLogs, period){
         chartData["Conspiracy"] += processedLogs[i]["Conspiracy"]
     }
     chartData["period"] = period
+    
     //calculate averageFactualReporting
     let total = chartData["Very Low"] + chartData["Low"] + chartData["Mixed"] + chartData["Moderate"] + chartData["High"] + chartData["Very High"]
     let totalScore = chartData["Very Low"]*0 + chartData["Low"]*1 + chartData["Mixed"]*2 + chartData["Moderate"]*3 + chartData["High"]*4 + chartData["Very High"]*5
@@ -227,7 +223,7 @@ function createBiasChart(chartData){
                 tooltip: {
                     callbacks: {
                         label: function(context){
-                            return context.label + ': ' + context.formattedValue + '%'
+                            return context.dataset.label + ': ' + context.formattedValue + '%'
                         }
                     }
                 },

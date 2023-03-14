@@ -5,10 +5,8 @@ class Metrics{
         this.currentDate = this.toISOLocal(date).split("T")[0].replaceAll("-","")
         this.historyEnabled = options.a
         this.collectionEnabled = options.b
-        //check if there is an entry for current date, if not then create empty entry for current date
-        //if history is over 30 days, delete older entries and save
     }
-
+    //return the local date time as an ISO string
     toISOLocal(d) {
         var z  = n =>  ('0' + n).slice(-2);
         var zz = n => ('00' + n).slice(-3);
@@ -24,8 +22,9 @@ class Metrics{
                z(d.getSeconds()) + '.' +
                zz(d.getMilliseconds()) +
                sign + z(off/60|0) + ':' + z(off%60); 
-      }
+    }
 
+    //is history option is enabled, check if current article has been added to history, if not add to logs and save
     async addLog(url,AS,MBFC){
         if(!this.historyEnabled){
             return
@@ -55,6 +54,7 @@ class Metrics{
         await this.saveLogs()
     }
 
+    //fetch history logs from local storage
     async fetchLogs(){
         let newLog = {
             "date":this.currentDate,
@@ -81,15 +81,15 @@ class Metrics{
         await this.saveLogs()
     }
 
+    //save history logs in memory to local storage
     async saveLogs(){
         await chrome.storage.local.set({"logs":this.logs})
-        await this.printStoredLogs()
         if(this.collectionEnabled == true){
             this.sendLogs()
         }
     }
+
     async sendLogs(){
-        //check if data has been sent today, if 
         let obj = await chrome.storage.local.get("lastDate")
         if(obj?.lastDate === this.currentDate){
             return;
@@ -100,7 +100,6 @@ class Metrics{
         console.log("packet to be sent:")
         console.log(packet)
 
-        //request sending data
         const api = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/experiment"
         const options = {
           method: "POST",
@@ -117,16 +116,7 @@ class Metrics{
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-          });
-
-    }
-
-    async printStoredLogs(){
-        let obj = await chrome.storage.local.get( "logs" );
-        //console.log("Logs currently in storage:")
-        //console.log(obj.logs)
-        obj = await chrome.storage.local.get("lastDate")
-        //console.log("date of last packet sent: "+obj?.lastDate)
+        });
     }
 
     async fetchToken(){
@@ -137,7 +127,16 @@ class Metrics{
             await chrome.storage.local.set({ "token":this.token });
         }
     }
+    
+    //print history logs in storage, use for debug
+    async printStoredLogs(){
+        let obj = await chrome.storage.local.get( "logs" );
+        console.log("Logs currently in storage:")
+        console.log(obj.logs)
+    }
 
+    //take a string and hash it to an signed int, this is used to anonimize article urls to check if
+    //it has been recorded in history logs or not
     hash(string){
         //set variable hash as 0
         var hash = 0;

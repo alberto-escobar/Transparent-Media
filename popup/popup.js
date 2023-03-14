@@ -92,20 +92,24 @@ async function generateASPopup(){
     element.setAttribute("style","max-width: 150px;")
     link.appendChild(element)
     ASprofile.append(link)
+
     //create title of news source
     element = document.createElement("h2")
     element.innerHTML = ASdata.name
     element.setAttribute("style","text-align: center")
     ASprofile.append(element)
+
     //create political bias header
     element = document.createElement("h3")
     element.innerHTML = "Media Bias Rating: <span style=" + stylingMap[ASdata.bias] + ">&nbsp;" + ASdata.bias + "&nbsp;</span>"
     element.setAttribute("title","Media bias rating is determined by allsides.com by reviewing the content of the news site publishes using various methods and determining where their bias lies on the left right political spectrum.");
     ASprofile.append(element)
+
     //create confidence level header
     //element = document.createElement("h3")
     //element.innerHTML = "Confidence Level: " + ASdata.confidence
     //ASprofile.append(element)
+
     //create community votes section
     element = document.createElement("h3")
     element.innerHTML = "Community Votes:"
@@ -124,6 +128,7 @@ async function generateASPopup(){
     votes.appendChild(agreement);
     votes.appendChild(disagreement);
     ASprofile.append(votes)
+    
     //create new lines and horizantal line for ending element
     element = document.createElement("br")
     ASprofile.append(element) 
