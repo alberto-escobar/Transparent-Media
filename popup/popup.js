@@ -40,7 +40,7 @@ async function generateMBFCPopup(){
     let link = document.createElement("a")
     link.setAttribute("href",MBFCdata.profile);
     link.setAttribute("target","_blank");
-    link.setAttribute("title","Click here to go to the MBFC profile");
+    link.setAttribute("title","Click here to go to the Media Bias Fact Check profile");
     let element = document.createElement("img")
     element.setAttribute("src","../icons/MBFClogo.png")
     element.setAttribute("style","max-width: 150px;")
@@ -86,7 +86,7 @@ async function generateASPopup(){
     let link = document.createElement("a")
     link.setAttribute("href",ASdata.allsidesurl);
     link.setAttribute("target","_blank");
-    link.setAttribute("title","Click here to go to the Allsides profile");
+    link.setAttribute("title","Click here to go to the All Sides profile");
     let element = document.createElement("img")
     element.setAttribute("src","../icons/allsideslogo.png")
     element.setAttribute("style","max-width: 150px;")

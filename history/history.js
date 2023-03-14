@@ -156,10 +156,10 @@ function createCategoryChart(chartData){
             ],
             datasets: [{
                 data: [
-                    100*chartData["news"]/chartData["articles"], 
-                    100*chartData["Pro-Science"]/chartData["articles"], 
-                    100*chartData["Satire"]/chartData["articles"], 
-                    100*chartData["Conspiracy"]/chartData["articles"],
+                    roundToTwo(100*chartData["news"]/chartData["articles"]), 
+                    roundToTwo(100*chartData["Pro-Science"]/chartData["articles"]), 
+                    roundToTwo(100*chartData["Satire"]/chartData["articles"]), 
+                    roundToTwo(100*chartData["Conspiracy"]/chartData["articles"]),
                 ],
                 backgroundColor: [
                     "lightsalmon",
@@ -170,12 +170,22 @@ function createCategoryChart(chartData){
             }]
         },
         options: {
-            responsive: true,
             plugins: {
+                tooltip: {
+                    callbacks: {
+                        title:function(context){
+                            return "Category"
+                        },
+                        label: function(context){
+                            return context.label + ': ' + context.formattedValue + '%'
+                        }
+                    }
+                },
                 legend: {
                     position: "left"
                 }
             },
+            responsive: true,
         },
     });
 }
@@ -188,32 +198,39 @@ function createBiasChart(chartData){
             datasets: [
                 {
                     label:'Left',
-                    data:[100*chartData["Left"]/chartData["news"]],
+                    data:[roundToTwo(100*chartData["Left"]/chartData["news"])],
                     backgroundColor:"blue"
                 },
                 {
                     label:'Lean Left',
-                    data:[100*chartData["Lean Left"]/chartData["news"]],
+                    data:[roundToTwo(100*chartData["Lean Left"]/chartData["news"])],
                     backgroundColor:"lightblue"
                 },
                 {
                     label:'Center',
-                    data:[100*chartData["Center"]/chartData["news"]],
+                    data:[roundToTwo(100*chartData["Center"]/chartData["news"])],
                     backgroundColor:"purple"
                 },
                 {
                     label:'Lean Right',
-                    data:[100*chartData["Lean Right"]/chartData["news"]],
+                    data:[roundToTwo(100*chartData["Lean Right"]/chartData["news"])],
                     backgroundColor:"lightcoral"
                 },{
                     label:'Right',
-                    data:[100*chartData["Right"]/chartData["news"]],
+                    data:[roundToTwo(100*chartData["Right"]/chartData["news"])],
                     backgroundColor:"red"
                 }
             ]
         },
         options: {
             plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context){
+                            return context.label + ': ' + context.formattedValue + '%'
+                        }
+                    }
+                },
                 legend: {
                     position: "left"
                 },
@@ -292,4 +309,8 @@ function createFactualChart(chartData){
             }
         }
     });
+}
+
+function roundToTwo(num) {
+    return +(Math.round(num + "e+2")  + "e-2");
 }
