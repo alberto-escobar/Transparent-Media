@@ -74,11 +74,11 @@ async function runContentScript(){
 function addTooltip(source,aElement){
   var tooltipMessage = ""
   if (source.ASbias){
-    tooltipMessage = tooltipMessage + "Allsides: " + source.ASbias + " bias\r\n"
+    tooltipMessage = tooltipMessage + "All Sides: " + source.ASbias + " Bias\r\n"
   }
     if (source.MBFCbias){
-      tooltipMessage = tooltipMessage + "MBFC: " + source.MBFCbias + " bias\r\n"
-      tooltipMessage = tooltipMessage + "MBFC: " + source.MBFCfactual + " factual reporting"
+      tooltipMessage = tooltipMessage + "Media Bias Fact Check: " + source.MBFCbias + " Bias\r\n"
+      tooltipMessage = tooltipMessage + "Media Bias Fact Check: " + source.MBFCfactual + " Sourcing"
     }
     if(tooltipMessage !== ""){
       aElement.title = tooltipMessage
@@ -86,12 +86,12 @@ function addTooltip(source,aElement){
 }
 
 const factualStickerStyle = {
-  "very high":"background-color:#1a9830;",
-  "high":"background-color:#1a9830;",
-  "mostly":"background-color:#88a81e;",
-  "mixed":"background-color:#E36C0A;",
-  "low":"background-color:#FF0000;",
-  "very low":"background-color:#FF0000;"
+  "Very High":"background-color:#1a9830;",
+  "High":"background-color:#1a9830;",
+  "Moderate":"background-color:#88a81e;",
+  "Mixed":"background-color:#E36C0A;",
+  "Low":"background-color:#FF0000;",
+  "Very Low":"background-color:#FF0000;"
 }
 
 function createMBFCFactualSticker (source){
@@ -101,7 +101,7 @@ function createMBFCFactualSticker (source){
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
   if(factualStickerStyle?.[factual]){
     sticker = document.createElement(elementType);
-    sticker.innerHTML = "MBFC: " + factual + " factual reporting" + "<br>"
+    sticker.innerHTML = "Media Bias Fact Check: " + factual + " Sourcing" + "<br>"
     //sticker.innerHTML = sticker.innerHTML + "<br>"
     sticker.setAttribute("style",factualStickerStyle?.[factual]+style);
     sticker.setAttribute("id",factual);
@@ -113,15 +113,16 @@ function createMBFCFactualSticker (source){
 }
 
 const biasStickerStyle = {
-  "left":"background-color:#2c64a4;",
-  "left-center":"background-color:#9cccec;",
-  "center":"background-color:#9464a4;",
-  "right-center":"background-color:#cc9c9c;",
-  "right":"background-color:#cc2424;",
-  "satire":"background-color:#d3db39;",
-  "pro-science":"background-color:#1a9830;",
-  "fake-news":"background-color:#000000;",
-  "conspiracy":"background-color:#000000;"
+  "Left":"background-color:#2c64a4;",
+  "Lean Left":"background-color:#9cccec;",
+  "Center":"background-color:#9464a4;",
+  "All Sides":"background-color:#9464a4;",
+  "Lean Right":"background-color:#cc9c9c;",
+  "Right":"background-color:#cc2424;",
+  "Satire":"background-color:#d3db39;",
+  "Pro-Science":"background-color:#1a9830;",
+  "Fake News":"background-color:#000000;",
+  "Conspiracy":"background-color:#000000;"
 }
 
 function createMBFCBiasSticker (source){
@@ -131,7 +132,7 @@ function createMBFCBiasSticker (source){
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
   if(biasStickerStyle?.[bias]){
     sticker = document.createElement(elementType);
-    sticker.innerHTML = "MBFC: " + bias + " bias" + "<br>"
+    sticker.innerHTML = "Media Bias Fact Check: " + bias + " Bias" + "<br>"
     sticker.setAttribute("style",biasStickerStyle?.[bias]+style);
     sticker.setAttribute("id",bias);
     return sticker;
@@ -143,14 +144,14 @@ function createMBFCBiasSticker (source){
 
 function createAllsidesBiasSticker (source){
   var bias = source.ASbias
-  var thing = "Allsides: " + source.ASbias + " bias<br>";
+  var thing = "Allsides: " + source.ASbias + " Bias<br>";
   var elementType = "span";
   var sticker;
   var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
 
   if(biasStickerStyle?.[bias]){
     sticker = document.createElement(elementType);
-    sticker.innerHTML = "AllSides: " + bias + " bias" + "<br>"
+    sticker.innerHTML = "All Sides: " + bias + " bias" + "<br>"
     sticker.setAttribute("style",biasStickerStyle?.[bias]+style);
     sticker.setAttribute("id",bias);
     return sticker;

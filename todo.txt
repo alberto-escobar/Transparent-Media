@@ -1,11 +1,14 @@
-history display feature:
-    fix gradiant issue when resizing (I CANNOT FUKCING FIX)
-    precentage instead of numbers for tool tips
-    prettify it
+remainder:
+    
+    add recentage sign to tooltips on charts
 
+history display feature:
+    DONE add explanations of ratings
+    DONE prettify it
     DONE add drop down menu to select period, should change charts when it changes
     DONE add button to get raw data
     DONE number of articles read
+    DONEadd note if history is turned off
     
 
 options feature :
@@ -14,16 +17,28 @@ options feature :
     DONE test that every option works
 
 popup feature:
-    make popup pretty
-
+    DONE add explanations of ratings
+    DONE make popup pretty
     DONE get rid of powered by buttons and developer button
 
 metrics feature:
     DONE make data pass through rapid api
     DONE make send data work
     DONE delete history after x days pass
-    
+    DONE time works for local
 
 backend API:
     process recieved data
     get ip of request
+
+
+
+explanations:
+AS:
+All news sites will have a political bias. Either they
+
+
+articles = the sum of news (sum of political bias) satire, proscience, and conspiracy
+news, conspiracy, satire, and proscience should be percentages of articles 
+news = sum of policial bias
+left, lean left, etc should be percentages of news articles read

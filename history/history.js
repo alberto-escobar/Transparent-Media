@@ -33,8 +33,13 @@ select.addEventListener("change", (event) => {
 await main(select.value)
 
 async function main(period){
+    
     let obj = await chrome.storage.local.get("logs");
     let logs = processLogs(obj.logs)
+    obj = await chrome.storage.local.get("options");
+    if(!obj.options.a){
+        alert("You have Transparent Media history turned off.")
+    }
     let chartData = generateChartData(logs,period)
     createTitle(chartData);
     createCategoryChart(chartData);
@@ -54,25 +59,25 @@ function processLog(dayLog){
     let date = dayLog.date
     let history = dayLog.history
 
-    let bias = ["left", "left-center", "center", "right-center", "right"]
+    let bias = ["Left", "Lean Left", "Center", "Lean Right", "Right"]
     let processedLog = {
         "date":parseInt(date),
         "articles":history.length,
-        "left":0,
-        "left-center":0,
-        "center":0,
-        "right-center":0,
-        "right":0,
-        "very low":0,
-        "low":0,
-        "mixed":0,
-        "mostly":0,
-        "high":0,
-        "very high":0,
-        "satire":0,
-        "pro-science":0,
-        "conspiracy":0,
-        "allsides":0
+        "Left":0,
+        "Lean Left":0,
+        "Center":0,
+        "Lean Right":0,
+        "Right":0,
+        "Very Low":0,
+        "Low":0,
+        "Mixed":0,
+        "Moderate":0,
+        "High":0,
+        "Very High":0,
+        "Satire":0,
+        "Pro-Science":0,
+        "Conspiracy":0,
+        "All Sides":0
     }
 
     for(let i = 0; i < history.length; i++){
@@ -102,35 +107,41 @@ function generateChartData(processedLogs, period){
     for(let i = 1; i < period; i++){
         
         chartData["articles"] += processedLogs[i]["articles"]
-        chartData["left"] += processedLogs[i]["left"]
-        chartData["left-center"] += processedLogs[i]["left-center"]
-        chartData["center"] += processedLogs[i]["center"]
-        chartData["right-center"] += processedLogs[i]["right-center"]
-        chartData["right"] += processedLogs[i]["right"]
-        chartData["very low"] += processedLogs[i]["very low"]
-        chartData["low"] += processedLogs[i]["low"]
-        chartData["mixed"] += processedLogs[i]["mixed"]
-        chartData["mostly"] += processedLogs[i]["mostly"]
+        chartData["Left"] += processedLogs[i]["Left"]
+        chartData["Lean Left"] += processedLogs[i]["Lean Left"]
+        chartData["Center"] += processedLogs[i]["Center"]
+        chartData["Lean Right"] += processedLogs[i]["Lean Right"]
+        chartData["Right"] += processedLogs[i]["Right"]
+        chartData["Very Low"] += processedLogs[i]["Very Low"]
+        chartData["Low"] += processedLogs[i]["Low"]
+        chartData["Mixed"] += processedLogs[i]["Mixed"]
+        chartData["Moderate"] += processedLogs[i]["Moderate"]
         chartData["high"] += processedLogs[i]["high"]
-        chartData["very high"] += processedLogs[i]["very high"]
+        chartData["Very High"] += processedLogs[i]["Very High"]
         chartData["satire"] += processedLogs[i]["satire"]
-        chartData["pro-science"] += processedLogs[i]["pro-science"]
-        chartData["conspiracy"] += processedLogs[i]["conspiracy"]
+        chartData["Pro-Science"] += processedLogs[i]["Pro-Science"]
+        chartData["Conspiracy"] += processedLogs[i]["Conspiracy"]
     }
     chartData["period"] = period
     //calculate averageFactualReporting
-    let total = chartData["very low"] + chartData["low"] + chartData["mixed"] + chartData["mostly"] + chartData["high"] + chartData["very high"]
-    let totalScore = chartData["very low"]*0 + chartData["low"]*1 + chartData["mixed"]*2 + chartData["mostly"]*3 + chartData["high"]*4 + chartData["very high"]*5
+    let total = chartData["Very Low"] + chartData["Low"] + chartData["Mixed"] + chartData["Moderate"] + chartData["High"] + chartData["Very High"]
+    let totalScore = chartData["Very Low"]*0 + chartData["Low"]*1 + chartData["Mixed"]*2 + chartData["Moderate"]*3 + chartData["High"]*4 + chartData["Very High"]*5
     chartData["average factual score"] = totalScore/total
 
     //calculate number of news articles (total of bias)
-    chartData["news"] = chartData["left"] + chartData["left-center"] + chartData["center"] + chartData["right-center"] + chartData["right"]
+    chartData["news"] = chartData["Left"] + chartData["Lean Left"] + chartData["Center"] + chartData["Lean Right"] + chartData["Right"]
     return chartData
 }
 
 function createTitle(chartData){
     let title = document.getElementById("title")
-    title.innerHTML = "In the past " + chartData["period"] + " days you have read " + chartData["articles"] + " articles!" 
+    if(chartData["period"] == 1){
+        title.innerHTML = "In the past " + chartData["period"] + " day you have read " + chartData["articles"] + " articles!"   
+    }
+    else{
+        title.innerHTML = "In the past " + chartData["period"] + " days you have read " + chartData["articles"] + " articles!" 
+    }
+
 }
 
 function createCategoryChart(chartData){
@@ -145,10 +156,10 @@ function createCategoryChart(chartData){
             ],
             datasets: [{
                 data: [
-                    chartData["news"], 
-                    chartData["pro-science"], 
-                    chartData["satire"], 
-                    chartData["conspiracy"],
+                    100*chartData["news"]/chartData["articles"], 
+                    100*chartData["Pro-Science"]/chartData["articles"], 
+                    100*chartData["Satire"]/chartData["articles"], 
+                    100*chartData["Conspiracy"]/chartData["articles"],
                 ],
                 backgroundColor: [
                     "lightsalmon",
@@ -163,10 +174,9 @@ function createCategoryChart(chartData){
             plugins: {
                 legend: {
                     position: "left"
-                },
+                }
             },
-        
-        }
+        },
     });
 }
 
@@ -174,30 +184,30 @@ function createBiasChart(chartData){
     biasChart = new Chart("biasChart", {
         type: 'bar',
         data: {
-            labels:["Bias"],
+            labels:["Media Bias"],
             datasets: [
                 {
                     label:'Left',
-                    data:[chartData["left"]],
+                    data:[100*chartData["Left"]/chartData["news"]],
                     backgroundColor:"blue"
                 },
                 {
                     label:'Lean Left',
-                    data:[chartData["left-center"]],
+                    data:[100*chartData["Lean Left"]/chartData["news"]],
                     backgroundColor:"lightblue"
                 },
                 {
                     label:'Center',
-                    data:[chartData["center"]],
+                    data:[100*chartData["Center"]/chartData["news"]],
                     backgroundColor:"purple"
                 },
                 {
                     label:'Lean Right',
-                    data:[chartData["right-center"]],
+                    data:[100*chartData["Lean Right"]/chartData["news"]],
                     backgroundColor:"lightcoral"
                 },{
                     label:'Right',
-                    data:[chartData["right"]],
+                    data:[100*chartData["Right"]/chartData["news"]],
                     backgroundColor:"red"
                 }
             ]
@@ -227,7 +237,9 @@ function createBiasChart(chartData){
 function createFactualChart(chartData){
     var bar = document.getElementById('factualChart')
     var bar_ctx = bar.getContext('2d');
-    var background_1 = bar_ctx.createLinearGradient(0, 0, 1000, 0);
+    //linear gradient should be made to the size of the canvas, but I cannot
+    //get bar.width to return the correct width.
+    var background_1 = bar_ctx.createLinearGradient(0, 0, 960, 0);
     background_1.addColorStop(0, 'red');
     background_1.addColorStop(0.5, 'orange');       
     background_1.addColorStop(1, 'green');       

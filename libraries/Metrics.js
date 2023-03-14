@@ -2,12 +2,30 @@ class Metrics{
     constructor(options){
         this.logs = []
         let date = new Date()
-        this.currentDate = date.toISOString().split("T")[0].replaceAll("-","")
+        this.currentDate = this.toISOLocal(date).split("T")[0].replaceAll("-","")
         this.historyEnabled = options.a
         this.collectionEnabled = options.b
         //check if there is an entry for current date, if not then create empty entry for current date
         //if history is over 30 days, delete older entries and save
     }
+
+    toISOLocal(d) {
+        var z  = n =>  ('0' + n).slice(-2);
+        var zz = n => ('00' + n).slice(-3);
+        var off = d.getTimezoneOffset();
+        var sign = off > 0? '-' : '+';
+        off = Math.abs(off);
+      
+        return d.getFullYear() + '-'
+               + z(d.getMonth()+1) + '-' +
+               z(d.getDate()) + 'T' +
+               z(d.getHours()) + ':'  + 
+               z(d.getMinutes()) + ':' +
+               z(d.getSeconds()) + '.' +
+               zz(d.getMilliseconds()) +
+               sign + z(off/60|0) + ':' + z(off%60); 
+      }
+
     async addLog(url,AS,MBFC){
         if(!this.historyEnabled){
             return
@@ -105,10 +123,10 @@ class Metrics{
 
     async printStoredLogs(){
         let obj = await chrome.storage.local.get( "logs" );
-        console.log("Logs currently in storage:")
-        console.log(obj.logs)
+        //console.log("Logs currently in storage:")
+        //console.log(obj.logs)
         obj = await chrome.storage.local.get("lastDate")
-        console.log("date of last packet sent: "+obj?.lastDate)
+        //console.log("date of last packet sent: "+obj?.lastDate)
     }
 
     async fetchToken(){

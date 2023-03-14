@@ -2,3 +2,6 @@ body{
     width: 360px;
     height:50px;
 }
+span{
+    border-radius: 3px;
+}

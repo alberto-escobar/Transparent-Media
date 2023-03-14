@@ -2,8 +2,75 @@ let nodata = document.getElementById("no-data");
 let ASprofile = document.getElementById("AS");
 let MBFCprofile = document.getElementById("MBFC");
 
-generateASPopup()
+const stylingMap = 
+  {
+    "Left":"background-color:#2c64a4;",
+    "Lean Left":"background-color:#9cccec;",
+    "Center":"background-color:#9464a4;",
+    "All Sides":"background-color:#9464a4;",
+    "Lean Right":"background-color:#cc9c9c;",
+    "Right":"background-color:#cc2424;",
+    "Satire":"background-color:#d3db39;",
+    "Pro-Science":"background-color:#1a9830;",
+    "Fake News":"background-color:#000000;",
+    "Conspiracy":"background-color:#000000;",
+    "Very High":"background-color:#1a9830;",
+    "High":"background-color:#1a9830;",
+    "Moderate":"background-color:#88a81e;",
+    "Mixed":"background-color:#E36C0A;",
+    "Low":"background-color:#FF0000;",
+    "Very Low":"background-color:#FF0000;"
+  }
+
+
 generateMBFCPopup()
+generateASPopup()
+
+
+async function generateMBFCPopup(){
+  let obj = await chrome.storage.local.get("MBFCPopupData")
+  MBFCdata = obj.MBFCPopupData
+  
+  if(MBFCdata === "no data"){
+    MBFCprofile.setAttribute("style","display:none;");
+  }
+  else{
+    nodata.setAttribute("style","display:none;");
+
+    let link = document.createElement("a")
+    link.setAttribute("href",MBFCdata.profile);
+    link.setAttribute("target","_blank");
+    link.setAttribute("title","Click here to go to the MBFC profile");
+    let element = document.createElement("img")
+    element.setAttribute("src","../icons/MBFClogo.png")
+    element.setAttribute("style","max-width: 150px;")
+    link.appendChild(element)
+    MBFCprofile.append(link)
+
+    element = document.createElement("h2")
+    element.innerHTML = MBFCdata.name
+    element.setAttribute("style","text-align: center;")
+    MBFCprofile.append(element)
+
+    element = document.createElement("h3")
+    element.innerHTML = "Media Bias Rating: <span style=" + stylingMap[MBFCdata.bias] + ">&nbsp;" + MBFCdata.bias + "&nbsp;</span>"
+    element.setAttribute("title","Media bias rating is determined by mediabiasfactcheck.com by reviewing the content of the news site publishes using various methods and determining where their bias lies on the left right political spectrum.");
+    MBFCprofile.append(element)
+
+    element = document.createElement("h3")
+    element.innerHTML = "Sourcing Rating: <span style=" + stylingMap[MBFCdata.factual] + ">&nbsp;" + MBFCdata.factual + "&nbsp;</span>"
+    element.setAttribute("title","Sourcing Rating is determined by mediabiasfactcheck.com by reviewing the quality of the sourcing material used by news sites in publishing articles. Sourcing rating metric is a scale as follows: very low, low, mixed, moderate, high, very high");
+    
+    MBFCprofile.append(element)
+    
+    //element = document.createElement("h3")
+    //element.innerHTML = "Credibility Rating: " + MBFCdata.credibility
+    //MBFCprofile.append(element) 
+
+    element = document.createElement("hr")
+    MBFCprofile.append(element)
+  }       
+}
 
 async function generateASPopup(){
   //get allsides data from storage
@@ -32,15 +99,17 @@ async function generateASPopup(){
     ASprofile.append(element)
     //create political bias header
     element = document.createElement("h3")
-    element.innerHTML = "Political Bias: " + ASdata.bias
+    element.innerHTML = "Media Bias Rating: <span style=" + stylingMap[ASdata.bias] + ">&nbsp;" + ASdata.bias + "&nbsp;</span>"
+    element.setAttribute("title","Media bias rating is determined by allsides.com by reviewing the content of the news site publishes using various methods and determining where their bias lies on the left right political spectrum.");
     ASprofile.append(element)
     //create confidence level header
-    element = document.createElement("h3")
-    element.innerHTML = "Confidence Level: " + ASdata.confidence
-    ASprofile.append(element)
+    //element = document.createElement("h3")
+    //element.innerHTML = "Confidence Level: " + ASdata.confidence
+    //ASprofile.append(element)
     //create community votes section
     element = document.createElement("h3")
     element.innerHTML = "Community Votes:"
+    element.setAttribute("title","Community agreement is determined by allsides.com by their voting system, those who choose to vote can dictate whether they agree or disagree with the media bias rating assigned.");
     ASprofile.append(element)
     var total = parseInt(ASdata.agreement) + parseInt(ASdata.disagreement);
     var agreementPercent = (parseInt(ASdata.agreement)/total) * 100;
@@ -65,47 +134,6 @@ async function generateASPopup(){
   } 
 }
 
-async function generateMBFCPopup(){
-  let obj = await chrome.storage.local.get("MBFCPopupData")
-  MBFCdata = obj.MBFCPopupData
-  
-  if(MBFCdata === "no data"){
-    MBFCprofile.setAttribute("style","display:none;");
-  }
-  else{
-    nodata.setAttribute("style","display:none;");
-
-    let link = document.createElement("a")
-    link.setAttribute("href",MBFCdata.profile);
-    link.setAttribute("target","_blank");
-    link.setAttribute("title","Click here to go to the MBFC profile");
-    let element = document.createElement("img")
-    element.setAttribute("src","../icons/MBFClogo.png")
-    element.setAttribute("style","max-width: 150px;")
-    link.appendChild(element)
-    MBFCprofile.append(link)
-
-    element = document.createElement("h2")
-    element.innerHTML = MBFCdata.name
-    element.setAttribute("style","text-align: center;")
-    MBFCprofile.append(element)
-
-    element = document.createElement("h3")
-    element.innerHTML = "Political Bias: " + MBFCdata.bias
-    MBFCprofile.append(element)
-
-    element = document.createElement("h3")
-    element.innerHTML = "Factual Reporting: " + MBFCdata.factual
-    MBFCprofile.append(element)
-    
-    element = document.createElement("h3")
-    element.innerHTML = "Credibility Rating: " + MBFCdata.credibility
-    MBFCprofile.append(element) 
-
-    element = document.createElement("hr")
-    MBFCprofile.append(element)
-  }       
-}
 
 //Event listeners for buttons to redirect you to a new tab based on what they click
 document.addEventListener('DOMContentLoaded', function () {

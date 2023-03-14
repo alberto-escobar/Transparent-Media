@@ -6,6 +6,26 @@ try { importScripts("libraries/Metrics.js"); } catch (e) { console.log(e); }
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
 
+//values from API have to be converted
+const conversionMap = {
+  "left":"Left",
+  "left-center":"Lean Left",
+  "center":"Center",
+  "right-center":"Lean Right",
+  "right":"Right",
+  "satire":"Satire",
+  "pro-science":"Pro-Science",
+  "fake-news":"Fake News",
+  "conspiracy":"Conspiracy",
+  "allsides":"All Sides",
+  "very high":"Very High",
+  "high":"High",
+  "mostly":"Moderate",
+  "mixed":"Mixed",
+  "low":"Low",
+  "VeryLow":"Very Low"
+}
+
 //listener event: Updates the database in memory when the extension is first installed.
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Transparent Media is installed!");
@@ -48,6 +68,9 @@ function fetchASDatabase(){
   fetch(AS_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
+      for (let i = 0; i < data.length; i++){
+        data[i].bias = conversionMap[data[i].bias]
+      }
       chrome.storage.local.set({ "ASdatabase" : data }, function(){
         console.log("Storing allsides database into storage with length of:" + data.length);
       });
@@ -69,6 +92,10 @@ function fetchMBFCDatabase(){
   fetch(MBFC_API_URL, options)
     .then((response) => response.json())
     .then((data) => {
+      for (let i = 0; i < data.length; i++){
+        data[i].bias = conversionMap[data[i].bias]
+        data[i].factual = conversionMap[data[i].factual]
+      }
       chrome.storage.local.set({ "MBFCdatabase" : data }, function(){
         console.log("Storing MBFC database into storage with length of:" + data.length);
       });
@@ -121,16 +148,16 @@ async function updatePopup(){
 }
 //javascript object that is a hash map of different political bias and thier respective icons
 const iconMap = {
-  "left":"icons/left.png",
-  "left-center":"icons/left center.png",
-  "center":"icons/center.png",
-  "right-center":"icons/right center.png",
-  "right":"icons/right.png",
-  "allsides":"icons/allsides.png",
-  "fake-news":"icons/bad.png",
-  "satire":"icons/satire.png",
-  "conspiracy":"icons/bad.png",
-  "pro-science":"icons/pro science.png",
+  "Left":"icons/left.png",
+  "Lean Left":"icons/left center.png",
+  "Center":"icons/center.png",
+  "Lean Right":"icons/right center.png",
+  "Right":"icons/right.png",
+  "All Sides":"icons/allsides.png",
+  "Fake News":"icons/bad.png",
+  "Satire":"icons/satire.png",
+  "Conspiracy":"icons/bad.png",
+  "Pro-Science":"icons/pro science.png",
 } 
 
 //update the popup icon with the bias of the current site you are viewing.

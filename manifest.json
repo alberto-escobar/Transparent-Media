@@ -1,6 +1,6 @@
 {
   "name": "Transparent Media",
-  "description": "An extension that reports to you the political bias of the website you are viewing based on a database of news sources.",
+  "description": "Provides information on the media bias rating of news sites you read online and track your media consumption habits overtime.",
   "version": "1.2",
   "manifest_version": 3,
 
