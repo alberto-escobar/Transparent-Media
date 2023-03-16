@@ -1,10 +1,21 @@
+//Module used for creating charts.
 import "./chart.min.js"
 
+//Global events get get chart generation to work
 let categoryChart
 let biasChart
 let factualChart
 
-//posts history logs to new window to copy and paste
+//Event Listener: Listen to changes to period selection drop down menu.
+let select = document.getElementById("period")
+select.addEventListener("change", (event) => {
+    categoryChart.destroy()
+    biasChart.destroy()
+    factualChart.destroy()
+    main(select.value)
+});
+
+//Event Listener: If Get Raw Data button is pressed posts history logs to new window for user to view and copy/paste.
 let getRawData = document.getElementById("getRawData")
 getRawData.addEventListener("click", (event) => {
     async function getRaw(){
@@ -16,18 +27,10 @@ getRawData.addEventListener("click", (event) => {
     getRaw()
 });
 
-//select period used for chart data
-let select = document.getElementById("period")
-select.addEventListener("change", (event) => {
-    categoryChart.destroy()
-    biasChart.destroy()
-    factualChart.destroy()
-    main(select.value)
-});
-
-//main function used to generate charts
+//Main
 await main(select.value)
 
+//Main function, grabs history logs and process them so they can be used in creating charts in the front end.
 async function main(period){
     let obj = await chrome.storage.local.get("logs");
     let logs = processLogs(obj.logs)
@@ -42,6 +45,7 @@ async function main(period){
     createFactualChart(chartData);
 }
 
+//Process history logs.
 function processLogs(logs){
     let processedLogs = []
     for(let i = 0; i < logs.length; i++){
@@ -50,6 +54,7 @@ function processLogs(logs){
     return processedLogs;
 }
 
+//Process log in history logs.
 function processLog(dayLog){
     let date = dayLog.date
     let history = dayLog.history
@@ -75,6 +80,7 @@ function processLog(dayLog){
         "All Sides":0
     }
 
+    //If there is a disagreement between MBFC and AS ratings, award opposing media biases with half a point.
     for(let i = 0; i < history.length; i++){
         if(history[i].ASbias && history[i].MBFCbias){
             processedLog[history[i].ASbias] += 0.5
@@ -90,13 +96,13 @@ function processLog(dayLog){
     return processedLog;
 }
 
+//Process history logs into chart data.
 function generateChartData(processedLogs, period){
     if (period > processedLogs.length){
         period = processedLogs.length
     }
-    //sort logs, most recent first
     processedLogs.sort((l1, l2) => (l1.date < l2.date) ? 1 : (l1.date > l2.date) ? -1 : 0);
-    //iterate with for loop and add all metrics
+
     let chartData = processedLogs[0]
     delete chartData.date
     for(let i = 1; i < period; i++){
@@ -104,7 +110,7 @@ function generateChartData(processedLogs, period){
         chartData["articles"] += processedLogs[i]["articles"]
         chartData["Left"] += processedLogs[i]["Left"]
         chartData["Lean Left"] += processedLogs[i]["Lean Left"]
-        chartData["Center"] += processedLogs[i]["Center"]
+        chartData["Center"] += processedLogs[i]["Center"] + processedLogs[i]["All Sides"]
         chartData["Lean Right"] += processedLogs[i]["Lean Right"]
         chartData["Right"] += processedLogs[i]["Right"]
         chartData["Very Low"] += processedLogs[i]["Very Low"]
@@ -119,16 +125,17 @@ function generateChartData(processedLogs, period){
     }
     chartData["period"] = period
     
-    //calculate averageFactualReporting
+    //Calculate average sourcing rating.
     let total = chartData["Very Low"] + chartData["Low"] + chartData["Mixed"] + chartData["Moderate"] + chartData["High"] + chartData["Very High"]
     let totalScore = chartData["Very Low"]*0 + chartData["Low"]*1 + chartData["Mixed"]*2 + chartData["Moderate"]*3 + chartData["High"]*4 + chartData["Very High"]*5
     chartData["average factual score"] = totalScore/total
 
-    //calculate number of news articles (total of bias)
-    chartData["news"] = chartData["Left"] + chartData["Lean Left"] + chartData["Center"] + chartData["Lean Right"] + chartData["Right"]
+    //Calculate number of news articles (sum of media bias ratings).
+    chartData["news"] = chartData["Left"] + chartData["Lean Left"] + chartData["Center"] + chartData["Lean Right"] + chartData["Right"] 
     return chartData
 }
 
+//Generate title for ratings history front end
 function createTitle(chartData){
     let title = document.getElementById("title")
     if(chartData["period"] == 1){
@@ -140,6 +147,7 @@ function createTitle(chartData){
 
 }
 
+//Generate chart element with breakdown of categories read.
 function createCategoryChart(chartData){
     categoryChart = new Chart("categoryChart", {
         type: 'pie',
@@ -186,6 +194,7 @@ function createCategoryChart(chartData){
     });
 }
 
+//Generate chart element with breakdown of media bias found in news articles.
 function createBiasChart(chartData){
     biasChart = new Chart("biasChart", {
         type: 'bar',
@@ -204,7 +213,7 @@ function createBiasChart(chartData){
                 },
                 {
                     label:'Center',
-                    data:[roundToTwo(100*chartData["Center"]/chartData["news"])],
+                    data:[roundToTwo(100*(chartData["Center"]/chartData["news"]))],
                     backgroundColor:"purple"
                 },
                 {
@@ -247,11 +256,11 @@ function createBiasChart(chartData){
     });
 }
 
+//Generate chart with acerage sourcing ratings.
 function createFactualChart(chartData){
     var bar = document.getElementById('factualChart')
     var bar_ctx = bar.getContext('2d');
-    //linear gradient should be made to the size of the canvas, but I cannot
-    //get bar.width to return the correct width.
+    //linear gradient should be made to the size of the canvas, but I cannot get bar.width to return the correct width.
     var background_1 = bar_ctx.createLinearGradient(0, 0, 960, 0);
     background_1.addColorStop(0, 'red');
     background_1.addColorStop(0.5, 'orange');       
@@ -307,6 +316,7 @@ function createFactualChart(chartData){
     });
 }
 
+//Rounding function to round percent calculations to two decimals points.
 function roundToTwo(num) {
     return +(Math.round(num + "e+2")  + "e-2");
 }

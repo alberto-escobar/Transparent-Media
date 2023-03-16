@@ -1,61 +1,85 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Transparent Media Options</title>
+    <title>Options</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="options.css">
     <script src="options.js"></script>
   </head>
+  
   <body>
-    
+
+    <h1>
+      Transparent Media Extension Options
+    </h1>
+
     <label class="switch">
       <input id = "tooltips" type="checkbox">
       <span class="slider round"></span>
     </label>
-    <span>Tooltips indicating media data</span>
+    <span>Add tooltips indicating ratings on google search</span>
+
     <br>
     <br>
+
     <label class="switch">
       <input id = "stickers" type="checkbox">
-    <span class="slider round"></span>
+      <span class="slider round"></span>
     </label>
-    <span>Stickers indicating media data</span>
+    <span>Add stickers indicating ratings on google search</span>
+
     <br>
     <hr>
     <br>
+
     <label class="switch">
       <input id = "useAS" type="checkbox">
-    <span class="slider round"></span>
+      <span class="slider round"></span>
     </label>
-    <span>Use allsides.com data</span>
+    <span>Use All Sides (allsides.com) data</span>
+
     <br>
     <br>
+
     <label class="switch">
       <input id = "useMBFC" type="checkbox">
-    <span class="slider round"></span>
+      <span class="slider round"></span>
     </label>
-    <span>Use mediabiasfactcheck.com data</span>
+    <span>Use Media Bias Fact Check (mediabiasfactcheck.com) data</span>
+
     <br>
     <hr>
     <br>
-    <button type="button" id="deleteHistory">Delete Ratings History</button>
-    <br>
-    <br>
+
     <label class="switch">
       <input id = "enableHistory" type="checkbox">
-    <span class="slider round"></span>
+      <span class="slider round"></span>
     </label>
-    <span>Enable rating history for articles</span>
+    <span>Enable ratings history</span>
+
     <br>
     <br>
+
     <label class="switch">
       <input id = "enableCollection" type="checkbox">
-    <span class="slider round"></span>
+      <span class="slider round"></span>
     </label>
-    <span>Enable anonymous data collection</span>
+    <span title="Data collected is number of ratings recorded on a daily basis. No personal information or information of the articles browsed will be collected.">
+      Enable anonymous data collection
+    </span>
+
+    <br>
+    <br>
+
+    <button type="button" id="deleteHistory">Delete Ratings History</button>
+
     <br>
     <hr>
     <br>
-    Transparent Media was developed by <a href="https://alberto-escobar.github.io/" target="#">Alberto Escobar Mingo.</a>
+    
+    <span>
+      Transparent Media was developed by <a href="https://alberto-escobar.github.io/" target="#">Alberto Escobar Mingo.</a>
+    </span>
+  
   </body>
 </html>

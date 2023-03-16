@@ -1,3 +1,5 @@
+//Metrics class helps record ratings of articles read by the user. No article information is stored except for the ratings found on All Sides and Media Bias Fact Check.
+
 class Metrics{
     constructor(options){
         this.logs = []
@@ -6,7 +8,8 @@ class Metrics{
         this.historyEnabled = options.a
         this.collectionEnabled = options.b
     }
-    //return the local date time as an ISO string
+
+    //Return the local date time as an ISO string.
     toISOLocal(d) {
         var z  = n =>  ('0' + n).slice(-2);
         var zz = n => ('00' + n).slice(-3);
@@ -24,7 +27,7 @@ class Metrics{
                sign + z(off/60|0) + ':' + z(off%60); 
     }
 
-    //is history option is enabled, check if current article has been added to history, if not add to logs and save
+    //Add ratings for article to history logs provided it is not already in there and history is enabled by the user. 
     async addLog(url,AS,MBFC){
         if(!this.historyEnabled){
             return
@@ -34,7 +37,8 @@ class Metrics{
         if(!AS&&!MBFC){
             return;
         }
-        let urlHash = this.hash(url); //hash url here, I do not want to save sensitive information
+        //Create hash of article url to check if rating has been record for today or not.
+        let urlHash = this.hash(url); 
         let currentDayHistory = this.logs[this.logs.length-1].history
         for(var i = 0; i < currentDayHistory.length; i++){
             if(currentDayHistory[i].articleHash === urlHash){
@@ -54,7 +58,7 @@ class Metrics{
         await this.saveLogs()
     }
 
-    //fetch history logs from local storage
+    //Fetch history logs from local storage.
     async fetchLogs(){
         let newLog = {
             "date":this.currentDate,
@@ -81,7 +85,7 @@ class Metrics{
         await this.saveLogs()
     }
 
-    //save history logs in memory to local storage
+    //Save history logs to local storage.
     async saveLogs(){
         await chrome.storage.local.set({"logs":this.logs})
         if(this.collectionEnabled == true){
@@ -89,13 +93,22 @@ class Metrics{
         }
     }
 
+    //Send history logs provided user has enabled anonymous data collection.
     async sendLogs(){
         let obj = await chrome.storage.local.get("lastDate")
         if(obj?.lastDate === this.currentDate){
             return;
         }
         await chrome.storage.local.set({"lastDate":this.currentDate})
-        await this.fetchToken()
+        
+        //Fetch token
+        obj = await chrome.storage.local.get("token")
+        this.token = obj.token
+        if(!this.token){
+            this.token = Math.floor(Math.random() * 4000000000)
+            await chrome.storage.local.set({ "token":this.token });
+        }
+
         let packet = { "token":this.token, "logs":this.logs}
         console.log("packet to be sent:")
         console.log(packet)
@@ -118,25 +131,15 @@ class Metrics{
             console.log(data);
         });
     }
-
-    async fetchToken(){
-        let obj = await chrome.storage.local.get("token")
-        this.token = obj.token
-        if(!this.token){
-            this.token = Math.floor(Math.random() * 4000000000)
-            await chrome.storage.local.set({ "token":this.token });
-        }
-    }
     
-    //print history logs in storage, use for debug
+    //Print history logs in storage, use for debug
     async printStoredLogs(){
         let obj = await chrome.storage.local.get( "logs" );
         console.log("Logs currently in storage:")
         console.log(obj.logs)
     }
 
-    //take a string and hash it to an signed int, this is used to anonimize article urls to check if
-    //it has been recorded in history logs or not
+    //Hashing function to convert strings to signed integers.
     hash(string){
         //set variable hash as 0
         var hash = 0;

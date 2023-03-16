@@ -1,12 +1,12 @@
-//importing external script
+//Import external scripts used for managing databases and ratings history.
 try { importScripts("libraries/DatabaseHelper.js"); } catch (e) { console.log(e); }
 try { importScripts("libraries/Metrics.js"); } catch (e) { console.log(e); }
 
-//use rapid api endpoint to track users
+//API endpoint urls.
 const AS_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/ASdata";
 const MBFC_API_URL = "https://transparent-media-extension-endpoints.p.rapidapi.com/extension/MBFCdata";
 
-//values from API have to be converted
+//Conversion map used to convert values in databases fetched from API to labels appropriate for front end use.
 const conversionMap = {
   "left":"Left",
   "left-center":"Lean Left",
@@ -26,7 +26,21 @@ const conversionMap = {
   "VeryLow":"Very Low"
 }
 
-//listener event: Updates the database in memory when the extension is first installed.
+//Filepath map for finding icon filepath for respective media bias rating.
+const iconMap = {
+  "Left":"icons/left.png",
+  "Lean Left":"icons/left center.png",
+  "Center":"icons/center.png",
+  "Lean Right":"icons/right center.png",
+  "Right":"icons/right.png",
+  "All Sides":"icons/allsides.png",
+  "Fake News":"icons/bad.png",
+  "Satire":"icons/satire.png",
+  "Conspiracy":"icons/bad.png",
+  "Pro-Science":"icons/pro science.png",
+} 
+
+//Listener event: On extension install, create options object, save to local storage and fetch databases from API.
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Transparent Media is installed!");
   let options = {"tooltips": true, "stickers":true, "ASData":true, "MBFCData":true, "a":true, "b":true};
@@ -35,25 +49,25 @@ chrome.runtime.onInstalled.addListener(() => {
   fetchMBFCDatabase();
 });
 
-//listener event: Updates the database in memory when a new chrome window is created or chrome is started up.
+//Listener event: When new chrome window created, fetch databases from API.
 chrome.windows.onCreated.addListener(() => {
   fetchASDatabase();
   fetchMBFCDatabase();
 });
 
-//listener event: whenever a tab is updated (e.g. the url changes), parse the url for the domain. If the url is defined and the page is loaded, run the updatePopup function
+//Listener event: When a tab is updated, update popup with search results from databases.
 chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
   if (tab.url !== undefined && changeinfo.status == "complete") {
     updatePopup();
   }
 });
 
-//listener event: whenever a tab is changed, the new active tab will have updatePopup executed
+//Listener event: When a tab is focused, update popup with search results from databases.
 chrome.tabs.onActivated.addListener(() => {
   updatePopup();
 });
 
-//fetchASDatabase(): Fetches allsides.com data from political bias database api.
+//Fetches allsides.com data from political bias database API and saves it to local storage.
 function fetchASDatabase(){
   const options = {
     method: "GET",
@@ -71,14 +85,11 @@ function fetchASDatabase(){
       for (let i = 0; i < data.length; i++){
         data[i].bias = conversionMap[data[i].bias]
       }
-      chrome.storage.local.set({ "ASdatabase" : data }, function(){
-        //debug
-        //console.log("Storing allsides database into storage with length of:" + data.length); 
-      });
+      chrome.storage.local.set({ "ASdatabase" : data });
     });
 }
 
-//fetchMBFCDatabase(): Fetches mediabiasfactcheck.com data from political bias database api.
+//Fetches mediabiasfactcheck.com data from political bias database API and saves it to local strorage.
 function fetchMBFCDatabase(){
   const options = {
     method: "GET",
@@ -97,14 +108,11 @@ function fetchMBFCDatabase(){
         data[i].bias = conversionMap[data[i].bias]
         data[i].factual = conversionMap[data[i].factual]
       }
-      chrome.storage.local.set({ "MBFCdatabase" : data }, function(){
-        //debug
-        //console.log("Storing MBFC database into storage with length of:" + data.length); 
-      });
+      chrome.storage.local.set({ "MBFCdatabase" : data });
     });
 }
 
-//update the popup with the current information available on the active tab
+//Update the popup with the current information available on the focused tab. Add ratings from focused tab to history logs if they have not been added yet today.
 async function updatePopup(){
     let options = await chrome.storage.local.get("options")
     options = options.options
@@ -144,26 +152,11 @@ async function updatePopup(){
       MBFCsearch = "no data"
     }
 
-    await chrome.storage.local.set({ 'ASPopupData':ASsearch, 'MBFCPopupData':MBFCsearch},() => {
-      //debug
-      //console.log("updated popup with:");console.log(ASsearch);console.log(MBFCsearch);
-    });
+    await chrome.storage.local.set({ 'ASPopupData':ASsearch, 'MBFCPopupData':MBFCsearch});
 }
-//javascript object that is a hash map of different political bias and thier respective icons
-const iconMap = {
-  "Left":"icons/left.png",
-  "Lean Left":"icons/left center.png",
-  "Center":"icons/center.png",
-  "Lean Right":"icons/right center.png",
-  "Right":"icons/right.png",
-  "All Sides":"icons/allsides.png",
-  "Fake News":"icons/bad.png",
-  "Satire":"icons/satire.png",
-  "Conspiracy":"icons/bad.png",
-  "Pro-Science":"icons/pro science.png",
-} 
 
-//update the popup icon with the bias of the current site you are viewing.
+
+//Update the popup icon with the bias of focused tab.
 function updatePopupIcon(source){
   if(source){
     chrome.action.setIcon({ "path": iconMap?.[source.bias]});
@@ -171,8 +164,4 @@ function updatePopupIcon(source){
   else{
     chrome.action.setIcon({ "path": "icons/unknown.png"});
   }
-}
-
-async function recordHistory(url, AS, MBFC){
-  
 }
