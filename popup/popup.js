@@ -66,12 +66,12 @@ async function generateMBFCPopup(){
 
     element = document.createElement("h3")
     element.innerHTML = "Media Bias Rating: <span style=" + stylingMap[MBFCdata.bias] + ">&nbsp;" + MBFCdata.bias + "&nbsp;</span>"
-    element.setAttribute("title","Media bias rating is determined by mediabiasfactcheck.com by reviewing the content of the news site publishes using various methods and determining where their bias lies on the left right political spectrum.");
+    element.setAttribute("title","Media bias rating is determined by mediabiasfactcheck.com by reviewing content published by the news site to determine where their media bias lies on the left right political spectrum.");
     MBFCprofile.append(element)
 
     element = document.createElement("h3")
     element.innerHTML = "Sourcing Rating: <span style=" + stylingMap[MBFCdata.factual] + ">&nbsp;" + MBFCdata.factual + "&nbsp;</span>"
-    element.setAttribute("title","Sourcing Rating is determined by mediabiasfactcheck.com by reviewing the quality of the sourcing material used by news sites in publishing articles. Sourcing rating metric is a scale as follows: very low, low, mixed, moderate, high, very high");
+    element.setAttribute("title","Sourcing Rating is determined by mediabiasfactcheck.com by reviewing the quality of the sources used in articles published by the news site. Sourcing rating has the following levels: very low, low, mixed, moderate, high, very high");
     MBFCprofile.append(element)
 
     element = document.createElement("hr")
@@ -108,7 +108,7 @@ async function generateASPopup(){
 
     element = document.createElement("h3")
     element.innerHTML = "Media Bias Rating: <span style=" + stylingMap[ASdata.bias] + ">&nbsp;" + ASdata.bias + "&nbsp;</span>"
-    element.setAttribute("title","Media bias rating is determined by allsides.com by reviewing the content of the news site publishes using various methods and determining where their bias lies on the left right political spectrum.");
+    element.setAttribute("title","Media bias rating is determined by allsides.com by reviewing content published by the news site to determine where their media bias lies on the left right political spectrum.");
     ASprofile.append(element)
 
     element = document.createElement("h3")
