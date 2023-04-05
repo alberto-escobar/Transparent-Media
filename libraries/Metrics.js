@@ -4,20 +4,19 @@ class Metrics{
     constructor(options){
         this.logs = []
         let date = new Date()
-        this.currentDate = this.toISOLocal(date).split("T")[0].replaceAll("-","")
+        this.currentDate = this.toISOLocalDate(date)
         this.historyEnabled = options.a
         this.collectionEnabled = options.b
     }
 
     //Return the local date time as an ISO string.
-    toISOLocal(d) {
+    toISOLocalDate(d) {
         var z  = n =>  ('0' + n).slice(-2);
         var zz = n => ('00' + n).slice(-3);
         var off = d.getTimezoneOffset();
         var sign = off > 0? '-' : '+';
         off = Math.abs(off);
-      
-        return d.getFullYear() + '-'
+        let output = d.getFullYear() + '-'
                + z(d.getMonth()+1) + '-' +
                z(d.getDate()) + 'T' +
                z(d.getHours()) + ':'  + 
@@ -25,10 +24,12 @@ class Metrics{
                z(d.getSeconds()) + '.' +
                zz(d.getMilliseconds()) +
                sign + z(off/60|0) + ':' + z(off%60); 
+        return output.split("T")[0].replaceAll("-","")
     }
 
     //Add ratings for article to history logs provided it is not already in there and history is enabled by the user. 
     async addLog(url,AS,MBFC){
+        
         if(!this.historyEnabled){
             return
         }
@@ -40,6 +41,7 @@ class Metrics{
         //Create hash of article url to check if rating has been record for today or not.
         let urlHash = this.hash(url); 
         let currentDayHistory = this.logs[this.logs.length-1].history
+
         for(var i = 0; i < currentDayHistory.length; i++){
             if(currentDayHistory[i].articleHash === urlHash){
                 return;
@@ -64,8 +66,10 @@ class Metrics{
             "date":this.currentDate,
             "history":[]
         }
+
         let obj = await chrome.storage.local.get("logs")
         this.logs = obj?.logs
+        
         if(this.logs === undefined){
             this.logs = []
             this.logs.push(newLog)
@@ -83,6 +87,9 @@ class Metrics{
             }
         }
         await this.saveLogs()
+
+        await this.fillGaps()
+
     }
 
     //Save history logs to local storage.
@@ -152,5 +159,30 @@ class Metrics{
             hash = hash & hash;
         }
         return hash;
+    }
+
+    async fillGaps(){
+        let currentDate = this.ISOLocalToDate(this.logs[0].date)
+        let missingDays = []
+        for(let i=1;i<this.logs.length;i++){
+            currentDate.setDate(currentDate.getDate() + 1)
+            let endDate = this.ISOLocalToDate(this.logs[i].date)
+            while(parseInt(this.toISOLocalDate(currentDate)) < parseInt(this.toISOLocalDate(endDate))){
+                let newLog = {
+                    "date":this.toISOLocalDate(currentDate),
+                    "history":[]
+                }
+                missingDays.push(newLog)
+                currentDate.setDate(currentDate.getDate() + 1)
+            }
+            currentDate = endDate
+        }
+        this.logs = this.logs.concat(missingDays)
+        this.logs.sort((l1, l2) => (parseInt(l1.date) > parseInt(l2.date)) ? 1 : (parseInt(l1.date) < parseInt(l2.date)) ? -1 : 0)
+        this.saveLogs()
+    }
+
+    ISOLocalToDate(dateString){
+        return new Date(dateString.slice(0,4) + "-" +  dateString.slice(4,6) + "-" +  dateString.slice(6) + "T12:00")
     }
 }
