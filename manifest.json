@@ -1,7 +1,7 @@
 {
   "name": "Transparent Media",
   "description": "Provides information on the media bias rating of news sites you read online and track your media consumption habits overtime.",
-  "version": "2.0",
+  "version": "2.1",
   "manifest_version": 3,
 
   "background": {
