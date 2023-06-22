@@ -108,7 +108,7 @@ function createMBFCFactualSticker (source){
   var factual = source.MBFCfactual;
   var elementType = "span";
   var sticker;
-  var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
+  var style = "color:#FFFFFF;border-radius: 5px;width: fit-content;font-size: 12px;";
   if(stickerStyle?.[factual]){
     sticker = document.createElement(elementType);
     sticker.innerHTML = "Media Bias Fact Check: " + factual + " Sourcing" + "<br>"
@@ -126,7 +126,7 @@ function createMBFCBiasSticker (source){
   var bias = source.MBFCbias;
   var elementType = "span";
   var sticker;
-  var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
+  var style = "color:#FFFFFF;border-radius: 5px;width: fit-content;font-size: 12px;";
   if(stickerStyle?.[bias]){
     sticker = document.createElement(elementType);
     sticker.innerHTML = "Media Bias Fact Check: " + bias + " Bias" + "<br>"
@@ -144,7 +144,7 @@ function createAllsidesBiasSticker (source){
   var thing = "Allsides: " + source.ASbias + " Bias<br>";
   var elementType = "span";
   var sticker;
-  var style = "color:#FFFFFF;border-radius: 5px;width: min-content;font-size: 12px;";
+  var style = "color:#FFFFFF;border-radius: 5px;width: fit-content;font-size: 12px;";
 
   if(stickerStyle?.[bias]){
     sticker = document.createElement(elementType);
